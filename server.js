@@ -24,15 +24,21 @@ const url = require("url");
 const ROOT = __dirname;
 const DATA_DIR = path.join(ROOT, "data");
 const IMAGES_DIR = path.join(ROOT, "images");
-const PORT = Number(process.env.PORT) || 8000;
-const HOST = process.env.HOST || "127.0.0.1";
+const PORT = Number(process.env.PORT) || Number(process.env.SERVER_PORT) || 8000;
+const HOST = process.env.HOST || "0.0.0.0";
 
 /* Dossiers servis par le serveur statique (liste blanche) */
 const SERVE_DIRS = ["assets", "images", "pages"];
 
 /* Fichiers servis a la racine : uniquement les pages du site.
    Tout le reste (server.js, package.json...) reste inaccessible. */
-const SERVE_ROOT_FILES = ["index.html", "collection.html", "product.html", "admin.html"];
+const SERVE_ROOT_FILES = [
+  "index.html",
+  "collection.html",
+  "product.html",
+  "admin.html",
+  "site.webmanifest"
+];
 
 const MAX_UPLOAD = 12 * 1024 * 1024; // 12 Mo par image
 const ALLOWED_IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".png", ".avif", ".gif"];
@@ -289,11 +295,44 @@ function isAuthed(req) {
 
 /* ---------------------------------------------------------------- Utilitaires HTTP */
 
+/**
+ * Le site est charge avec des polices Google et du JavaScript externe a la
+ * page : la CSP doit donc les autoriser explicitement. 'unsafe-inline' reste
+ * necessaire pour les styles, car le projet n'utilise pas de feuille de
+ * style unique (les couleurs et les mises en page sont portees par des
+ * attributs style="" sur les composants).
+ */
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com data:",
+  "img-src 'self' data: blob:",
+  "connect-src 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "object-src 'none'"
+].join("; ");
+
 function send(res, status, body, headers) {
   const h = Object.assign(
-    { "X-Content-Type-Options": "nosniff", "Referrer-Policy": "strict-origin-when-cross-origin" },
+    {
+      "X-Content-Type-Options": "nosniff",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      /* Interdit d'inclure le site dans une iframe : evite le clickjacking
+         sur le bouton de connexion et le tableau de bord. */
+      "X-Frame-Options": "DENY",
+      "Content-Security-Policy": CSP,
+      "Permissions-Policy": "geolocation=(), microphone=(), camera=()"
+    },
     headers || {}
   );
+  /* HSTS n'a de sens qu'en HTTPS : envoyer cet en-tete en HTTP verrouillerait
+     le domaine sur une connexion qui n'existe pas encore. */
+  if (String(res.req && res.req.headers["x-forwarded-proto"]) === "https") {
+    h["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains";
+  }
   const payload = Buffer.isBuffer(body) ? body : Buffer.from(String(body), "utf8");
   h["Content-Length"] = payload.length;
   res.writeHead(status, h);
@@ -302,6 +341,82 @@ function send(res, status, body, headers) {
 
 function json(res, status, value) {
   send(res, status, JSON.stringify(value), { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" });
+}
+
+/* ------------------------------------------------------- Pages d'erreur --- */
+
+const ERROR_PAGE = path.join(ROOT, "error.html");
+
+/* Le contenu est identique pour 403, 404 et 500 : seul le message change.
+   Les textes sont en anglais comme le reste du site. */
+const ERROR_COPY = {
+  403: {
+    title: "This area is not open to visitors",
+    text: "This page is reserved for our team, or the link you followed does not exist. The collection is still open to you."
+  },
+  404: {
+    title: "This piece has moved on",
+    text: "The page you were looking for does not exist, or the link is out of date. The collection is still here."
+  },
+  500: {
+    title: "Something went wrong on our side",
+    text: "This is our fault, not yours. Nothing you did caused it. Try again in a moment, or reach us directly and we will sort it out."
+  }
+};
+
+/**
+ * Rend une page d'erreur lisible dans le navigateur.
+ *
+ * On sert le vrai code HTTP (404, 403, 500) : c'est ce que Google et les
+ * robots lisent. Renvoyer 200 avec une page d'erreur ferait indexer une
+ * page morte comme si elle existait.
+ *
+ * Le fichier error.html est lu a chaque requete plutot que mis en cache,
+ * pour qu'une correction en production s'applique immediatement.
+ */
+function errorPage(res, req, status) {
+  const copy = ERROR_COPY[status] || ERROR_COPY[500];
+
+  let html = "";
+  try {
+    html = fs.readFileSync(ERROR_PAGE, "utf8");
+    html = html
+      .replace(">404<", ">" + status + "<")
+      .replace(/>This piece has moved on</, ">" + copy.title + "<")
+      .replace(/(<p class="errpage__text" id="text">)[\s\S]*?(<\/p>)/, "$1" + copy.text + "$2")
+      /* Le titre de l'onglet doit correspondre a l'erreur reelle. */
+      .replace(/<title>[\s\S]*?<\/title>/, "<title>" + status + " — Marie Minks</title>");
+  } catch (e) {
+    /* Si error.html est lui-meme manquant, on ne doit pas masquer l'erreur
+       derriere une page vide : on retombe sur un texte simple. */
+    html = "<!DOCTYPE html><meta charset=utf-8><title>" + status + "</title><p>" + status + " - " + copy.title + "</p>";
+  }
+
+  send(res, status, html, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" });
+}
+
+/**
+ * Le cookie de session doit porter 'Secure' des que le site est en HTTPS.
+ * On lit l'en-tete du proxy (Railway le positionne) plutot que d'imposer
+ * la variable : en local le site tourne en HTTP et refuserait le cookie,
+ * ce qui casserait la connexion sur la machine de developpement.
+ */
+function isHttps(req) {
+  const proto = String((req.headers && req.headers["x-forwarded-proto"]) || "").split(",")[0].trim();
+  return proto === "https";
+}
+
+/** Construit l'en-tete Set-Cookie du cookie de session. */
+function sessionCookie(req, token) {
+  const attrs = [
+    "mm_session=" + token,
+    "HttpOnly",
+    "Path=/",
+    "SameSite=Strict",
+    "Max-Age=" + Math.floor(SESSION_TTL / 1000)
+  ];
+  if (isHttps(req)) attrs.push("Secure");
+  return attrs.join("; ");
 }
 
 function text(res, status, value, type) {
@@ -349,6 +464,7 @@ const MIME = {
   ".avif": "image/avif",
   ".gif": "image/gif",
   ".ico": "image/x-icon",
+  ".webmanifest": "application/manifest+json; charset=utf-8",
   ".xml": "application/xml; charset=utf-8",
   ".txt": "text/plain; charset=utf-8",
   ".woff": "font/woff",
@@ -413,20 +529,41 @@ function findLiteral(source, name) {
     return { start, end: start, before: lines.slice(0, start), after: lines.slice(start + 1), inlineOpen };
   }
 
+  /* On parcourt les caracteres en comptant les crochets, en ignorant
+     ceux qui sont a l'interieur d'une chaine. Compter est la seule methode
+     fiable : un tableau imbrique (par exemple "badges") peut se terminer
+     sur une ligne "];" qui ressemble a la fin du bloc. */
   let end = -1;
-  for (let i = start + 1; i < lines.length; i++) {
-    const t = lines[i].trim();
-    if (t === "];" || t === "]") {
-      end = i;
-      /* Style généré : le "]" est suivi d'un ";" seul sur sa ligne.
-         Les deux font partie du bloc, sinon le ";" se dupliquerait
-         a chaque réécriture. */
-      if (t === "]" && i + 1 < lines.length && lines[i + 1].trim() === ";") end = i + 1;
-      break;
+  let depth = 0;
+  let opened = false;
+  let quote = "";
+  let escaped = false;
+
+  scan: for (let i = start; i < lines.length; i++) {
+    const line = lines[i];
+    for (let c = 0; c < line.length; c++) {
+      const ch = line[c];
+      if (quote) {
+        if (escaped) { escaped = false; continue; }
+        if (ch === "\\") { escaped = true; continue; }
+        if (ch === quote) quote = "";
+        continue;
+      }
+      if (ch === '"' || ch === "'" || ch === "`") { quote = ch; continue; }
+      if (ch === "[") { depth++; opened = true; continue; }
+      if (ch === "]") {
+        depth--;
+        if (opened && depth === 0) { end = i; break scan; }
+      }
     }
-    if (t === ";") { end = i; break; }
   }
   if (end < 0) return null;
+
+  /* Style généré : le "]" est suivi d'un ";" seul sur sa ligne.
+     Les deux font partie du bloc, sinon le ";" se dupliquerait
+     a chaque réécriture. */
+  const t = lines[end].trim();
+  if (t === "]" && end + 1 < lines.length && lines[end + 1].trim() === ";") end = end + 1;
 
   /* Un ";" seul sur sa ligne est la ponctuation de fin du bloc généré :
      elle n'appartient pas au littéral. */
@@ -844,8 +981,9 @@ function renderSeoHead(rel, query) {
     "@id": SITE_URL + "/#organization",
     name: "Marie Minks",
     url: SITE_URL + "/",
-    logo: SITE_URL + "/assets/img/logo.svg",
-    description: "Luxury mink coats and fur, made to order at our workshop in Splalding, UK.",
+    logo: SITE_URL + "/assets/img/crest-share.png",
+    description:
+      "Luxury mink coats and fur, made of 100% real fur by Marie Minks.",
     sameAs: ["https://wa.me/447723143962"],
     address: {
       "@type": "PostalAddress",
@@ -867,14 +1005,15 @@ function renderSeoHead(rel, query) {
   };
 
   const parts = [];
-  let title, desc, canonical, ogType = "website", ld = [], ogImage = SITE_URL + "/assets/img/logo.svg";
+  let title, desc, canonical, ogType = "website", ld = [], ogImage = SITE_URL + "/assets/img/crest-share.png";
   let noindex = false;
 
   if (rel === "/" || rel === "/index.html") {
     const meta = seo["page:home"] || {};
-    title = meta.title || "Marie Minks — Luxury Mink Coats & Fur, Made to Order in the UK";
-    desc = meta.description ||
-      "Marie Minks crafts luxury mink coats to order from our workshop in Splalding, UK. Pattern mink, kids fur and accessories.";
+    title = meta.title || "100% Real Mink Fur Coats – Marie Minks";
+    desc =
+      meta.description ||
+      "Find great deals on mink fur coats and jackets, made of 100% real fur! Prepare for the winter with a real fur mink coat. Expect nothing less than pure luxury from Marie Minks";
     canonical = canonicalFor("/");
     ld = [
       org,
@@ -952,7 +1091,7 @@ function renderSeoHead(rel, query) {
       );
       ogImage = (p.images || []).length
         ? imageUrl((p.images || [])[0])
-        : SITE_URL + "/assets/img/logo.svg";
+        : SITE_URL + "/assets/img/crest-share.png";
 
       const variants = (p.sizes || []).map((size) => ({
         "@type": "Offer",
@@ -980,7 +1119,7 @@ function renderSeoHead(rel, query) {
         color: (p.colors || []).map((c) => c.name).join(", ") || undefined,
         material: (p.specs || {})["Fur type"] || undefined,
         /* Sans vraie photo, on n'omet pas le champ image plutot que de
-           pointer vers le logo : Google n'accordera pas de resultat enrichi,
+           pointant vers le logo : Google n'accordera pas de resultat enrichi,
            ce qui est preferable a une image trompeuse. */
         image: hasPhoto && (p.images || []).length ? (p.images || []).map(imageUrl) : undefined,
         aggregateRating:
@@ -1021,12 +1160,21 @@ function renderSeoHead(rel, query) {
     if (rel === "/pages/checkout.html") noindex = true;
   }
 
-  if (!desc) desc = "Marie Minks — luxury mink coats and fur, made to order in Greece.";
+  if (!desc)
+    desc =
+      "Find great deals on mink fur coats and jackets, made of 100% real fur! Prepare for the winter with a real fur mink coat. Expect nothing less than pure luxury from Marie Minks";
 
   parts.push("<title>" + esc(title) + "</title>");
   parts.push('<meta name="description" content="' + esc(desc) + '">');
   parts.push('<link rel="canonical" href="' + esc(canonical) + '">');
   if (noindex) parts.push('<meta name="robots" content="noindex,nofollow">');
+
+  /* Favicons servis depuis le disque. Le crest est un SVG : un SVG ne fait pas
+     une icone d'onglet fiable, on pointe donc vers l'ICO et les PNG rastérisés. */
+  parts.push('<link rel="icon" href="/assets/img/favicon.ico" sizes="any">');
+  parts.push('<link rel="icon" href="/assets/img/icon-192.png" type="image/png">');
+  parts.push('<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">');
+  parts.push('<link rel="manifest" href="/site.webmanifest">');
 
   parts.push('<meta property="og:site_name" content="Marie Minks">');
   parts.push('<meta property="og:type" content="' + ogType + '">');
@@ -1106,11 +1254,30 @@ function visitorSid(req) {
   return sid && /^[a-f0-9]{8,64}$/.test(sid) ? sid : null;
 }
 
+/* Journal de trafic.
+   Cette fonction est appelee a chaque page vue : elle ne doit JAMAIS lever.
+   Une erreur d'ecriture (disque plein, fichier verrouille, droits) est
+   ignoree, sinon une seule requete suffit a arreter tout le site. */
+let trafficLines = 0;
+
 function logTraffic(entry) {
-  appendLine(TRAFFIC_LOG(), entry);
-  const lines = fs.readFileSync(TRAFFIC_LOG(), "utf8").split("\n");
-  if (lines.length > 20000) {
-    fs.writeFileSync(TRAFFIC_LOG(), lines.slice(-12000).join("\n"), "utf8");
+  const file = TRAFFIC_LOG();
+  try {
+    appendLine(file, entry);
+    trafficLines += 1;
+
+    /* On ne relit le fichier que lorsqu'il faut vraiment le tronquer. */
+    if (trafficLines > 20000) {
+      const lines = fs.readFileSync(file, "utf8").split("\n");
+      if (lines.length > 20000) {
+        fs.writeFileSync(file, lines.slice(-12000).join("\n"), "utf8");
+        trafficLines = 12000;
+      } else {
+        trafficLines = lines.length;
+      }
+    }
+  } catch (e) {
+    /* Journalisation non critique : on abandonne cette entree. */
   }
 }
 
@@ -1242,8 +1409,7 @@ async function handleApi(req, res, pathname) {
     send(res, 200, JSON.stringify({ ok: true }), {
       "Content-Type": "application/json",
       "Cache-Control": "no-store",
-      "Set-Cookie":
-        "mm_session=" + token + "; HttpOnly; Path=/; SameSite=Strict; Max-Age=" + Math.floor(SESSION_TTL / 1000)
+      "Set-Cookie": sessionCookie(req, token)
     });
     return true;
   }
@@ -1303,8 +1469,7 @@ async function handleApi(req, res, pathname) {
     send(res, 200, JSON.stringify({ ok: true }), {
       "Content-Type": "application/json; charset=utf-8",
       "Cache-Control": "no-store",
-      "Set-Cookie":
-        "mm_session=" + fresh + "; HttpOnly; Path=/; SameSite=Strict; Max-Age=" + Math.floor(SESSION_TTL / 1000)
+      "Set-Cookie": sessionCookie(req, fresh)
     });
     return true;
   }
@@ -1366,8 +1531,7 @@ async function handleApi(req, res, pathname) {
     send(res, 200, JSON.stringify({ ok: true }), {
       "Content-Type": "application/json; charset=utf-8",
       "Cache-Control": "no-store",
-      "Set-Cookie":
-        "mm_session=" + token + "; HttpOnly; Path=/; SameSite=Strict; Max-Age=" + Math.floor(SESSION_TTL / 1000)
+      "Set-Cookie": sessionCookie(req, token)
     });
     return true;
   }
@@ -1500,7 +1664,11 @@ async function handleApi(req, res, pathname) {
   if (route === "logout" && req.method === "POST") {
     send(res, 200, JSON.stringify({ ok: true }), {
       "Content-Type": "application/json",
-      "Set-Cookie": "mm_session=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0"
+      /* La deconnexion doit porter les memes attributs que la pose du
+         cookie, sinon un navigateur peut refuser d'effacer le cookie
+         existant et laisser une session ouverte. */
+      "Set-Cookie": "mm_session=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0" +
+        (isHttps(req) ? "; Secure" : "")
     });
     return true;
   }
@@ -1511,12 +1679,15 @@ async function handleApi(req, res, pathname) {
       json(res, 400, { ok: false, error: "Mot de passe actuel incorrect" });
       return true;
     }
-    if (!body.next || String(body.next).length < 8) {
-      json(res, 400, { ok: false, error: "Le nouveau mot de passe doit faire au moins 8 caracteres" });
+    if (!body.next || String(body.next).length < 10) {
+      json(res, 400, { ok: false, error: "Le nouveau mot de passe doit faire au moins 10 caracteres" });
       return true;
     }
     const salt = crypto.randomBytes(16).toString("hex");
     writeJSON(path.join(DATA_DIR, "admin.json"), {
+      /* On conserve l'email : l'admin a besoin de pouvoir recuperer son
+         mot de passe. Ecrire tout l'objet ici le supprimerait. */
+      email: ADMIN.email || "",
       salt,
       hash: hashPassword(body.next, salt),
       created: ADMIN.created
@@ -1597,7 +1768,19 @@ async function handleApi(req, res, pathname) {
 
   if (route === "upload" && req.method === "POST") {
     const raw = (req.headers["x-filename"] || "").toString();
-    const name = path.basename(raw).replace(/[^A-Za-z0-9._-]/g, "-");
+
+    /* Le nom est decode avant tout traitement : un "%2F" envoye par un client
+       est un vrai separateur de chemin, pas un caractere du nom de fichier.
+       Un nom qui en contient est refuse plutot que renormalise, sinon une
+       tentative de traversee se retrouve acceptee sous un nom inoffensif. */
+    let decoded = raw;
+    try { decoded = decodeURIComponent(raw); } catch (e) { decoded = raw; }
+    if (/[/\\]/.test(decoded) || decoded.indexOf("..") !== -1) {
+      json(res, 400, { ok: false, error: "Nom de fichier invalide" });
+      return true;
+    }
+
+    const name = path.basename(decoded).replace(/[^A-Za-z0-9._-]/g, "-");
     if (!name) {
       json(res, 400, { ok: false, error: "Nom de fichier manquant (header X-Filename)" });
       return true;
@@ -1731,6 +1914,28 @@ function loadAdminNoCreate() {
 
 /* ---------------------------------------------------------------- Statique */
 
+/**
+ * En-tetes de securite appliques a toute reponse, y compris aux fichiers
+ * servis en flux et aux pages HTML. send() les pose deja ; cette fonction
+ * sert a ne pas les oublier sur les chemins qui ecrivent directement.
+ */
+function securityHeaders(res, req, extra) {
+  const h = Object.assign(
+    {
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "Content-Security-Policy": CSP,
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Permissions-Policy": "geolocation=(), microphone=(), camera=()"
+    },
+    extra || {}
+  );
+  if (req && isHttps(req)) {
+    h["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains";
+  }
+  return h;
+}
+
 function serveStatic(req, res, pathname) {
   let rel = decodeURIComponent(pathname);
   if (rel.endsWith("/")) rel += "index.html";
@@ -1738,18 +1943,35 @@ function serveStatic(req, res, pathname) {
   const target = path.resolve(ROOT, "." + rel);
   const relative = path.relative(ROOT, target);
 
-  /* Liste blanche : "" = racine (uniquement les pages), sinon un dossier autorise */
   const top = relative.includes(path.sep) ? relative.split(path.sep)[0] : "";
   const allowed = top === "" ? SERVE_ROOT_FILES.includes(relative) : SERVE_DIRS.includes(top);
 
+  /* Un chemin qui sort du dossier racine est rejete avant tout acces disque. */
+  if (relative.startsWith("..") || path.isAbsolute(relative)) {
+    errorPage(res, req, 403);
+    return;
+  }
+
+  /* Un fichier qui n'existe pas repond 404, meme hors liste blanche : sinon
+     une simple faute de frappe sur l'extension d'une URL donnerait 403, ce
+     qui est trompeur et fait perdre des pages aux robots. */
+  const exists = fs.existsSync(target);
+  if (!exists) {
+    errorPage(res, req, 404);
+    return;
+  }
+
+  /* La liste blanche ne protege que ce qui existe : un fichier sensible
+     (.env, admin.json, server.js) reste inaccessible, meme si un
+     visiteur tombe dessus par devinette. */
   if (!allowed) {
-    text(res, 403, "403 - Acces refuse");
+    errorPage(res, req, 403);
     return;
   }
 
   fs.stat(target, (err, stat) => {
     if (err || !stat.isFile()) {
-      text(res, 404, "404 - " + rel);
+      errorPage(res, req, 404);
       return;
     }
 
@@ -1757,7 +1979,7 @@ function serveStatic(req, res, pathname) {
     const etag = '"' + stat.size.toString(16) + "-" + stat.mtimeMs.toString(16) + '"';
 
     if (req.headers["if-none-match"] === etag) {
-      res.writeHead(304, { ETag: etag });
+      res.writeHead(304, securityHeaders(res, req, { ETag: etag }));
       res.end();
       return;
     }
@@ -1772,7 +1994,7 @@ function serveStatic(req, res, pathname) {
       try {
         html = fs.readFileSync(target, "utf8");
       } catch (e) {
-        text(res, 500, "500 - lecture impossible");
+        errorPage(res, req, 500);
         return;
       }
       const query = url.parse(req.url, true).query || {};
@@ -1780,34 +2002,45 @@ function serveStatic(req, res, pathname) {
       const buf = Buffer.from(out, "utf8");
 
       /* Un slug inconnu doit repondre 404, pas 200 : sinon Google
-         l'indexe quand meme et il considere la page comme un "soft 404". */
-      let status = 200;
-      let noCache = "no-cache";
+         l'indexe quand meme et il considere la page comme un "soft 404".
+         Ici on rend directement la page d'erreur : afficher la fiche
+         produit avec un bandeau d'erreur ferait perdre la vente. */
       if (rel === "/product.html" && query.p && !getProducts().some((x) => x.slug === query.p)) {
-        status = 404;
-        noCache = "no-store";
+        errorPage(res, req, 404);
+        return;
+      }
+      if (rel === "/collection.html" && query.c && !getCollections().some((c) => c.slug === query.c)) {
+        errorPage(res, req, 404);
+        return;
       }
 
-      res.writeHead(status, {
-        "Content-Type": MIME[ext],
-        "Content-Length": buf.length,
-        /* L'ETag porte sur le fichier source : si la config SEO change,
-           le ETag doit changer aussi, sinon Google gardera son cache. */
-        ETag: '"' + stat.size.toString(16) + "-" + stat.mtimeMs.toString(16) + "-seo" + jsonMd5(),
-        "Cache-Control": noCache,
-        "X-Content-Type-Options": "nosniff"
-      });
+      let status = 200;
+      let noCache = "no-cache";
+
+      res.writeHead(
+        status,
+        securityHeaders(res, req, {
+          "Content-Type": MIME[ext],
+          "Content-Length": buf.length,
+          /* L'ETag porte sur le fichier source : si la config SEO change,
+             le ETag doit changer aussi, sinon Google gardera son cache. */
+          ETag: '"' + stat.size.toString(16) + "-" + stat.mtimeMs.toString(16) + "-seo" + jsonMd5(),
+          "Cache-Control": noCache
+        })
+      );
       res.end(buf);
       return;
     }
 
-    res.writeHead(200, {
-      "Content-Type": MIME[ext] || "application/octet-stream",
-      "Content-Length": stat.size,
-      "ETag": etag,
-      "Cache-Control": ext === ".html" ? "no-cache" : isAdmin ? "no-store" : "public, max-age=3600",
-      "X-Content-Type-Options": "nosniff"
-    });
+    res.writeHead(
+      200,
+      securityHeaders(res, req, {
+        "Content-Type": MIME[ext] || "application/octet-stream",
+        "Content-Length": stat.size,
+        ETag: etag,
+        "Cache-Control": ext === ".html" ? "no-cache" : isAdmin ? "no-store" : "public, max-age=3600"
+      })
+    );
     fs.createReadStream(target).pipe(res);
   });
 }
@@ -1869,14 +2102,18 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method !== "GET" && req.method !== "HEAD") {
-      text(res, 405, "405 - Methode non autorisee");
+      /* 405 : on laisse le code parler, la page est la meme que pour 404
+         car il s'agit aussi d'une URL qui ne mène nulle part. */
+      errorPage(res, req, 404);
       return;
     }
 
     serveStatic(req, res, pathname);
   } catch (e) {
     console.error("Erreur serveur :", e.message);
-    if (!res.headersSent) text(res, 500, "500 - " + e.message);
+    /* On ne montre jamais le message technique au visiteur : il pourrait
+       reveler un chemin de fichier ou une requete SQL. */
+    if (!res.headersSent) errorPage(res, req, 500);
   }
 });
 

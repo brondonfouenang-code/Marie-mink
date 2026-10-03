@@ -358,7 +358,10 @@ h4 { font-size: var(--fs-h4); }
 .nav-item__panel a:hover { background: var(--c-bg-meta); padding-left: 1.6rem; }
 
 .header__logo { display: flex; justify-content: center; }
-.header__logo img { max-height: 44px; width: auto; }
+/* Le crest est un bandeau horizontal (944.5x522, ratio 1.81) : on borne la
+   largeur comme sur le site Shopify d'origine, la hauteur suit tout seule. */
+.header__logo img { width: clamp(150px, 15vw, 205px); height: auto; }
+.header__mark { display: block; }
 
 .header__actions {
   display: flex;
@@ -656,11 +659,20 @@ h4 { font-size: var(--fs-h4); }
 .card__price del { font-weight: 400; color: var(--c-text-40); }
 .card__price ins { text-decoration: none; color: var(--c-accent); }
 
-.card__swatches { display: flex; gap: 0.3rem; margin-top: 0.5rem; }
+.card__swatches { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem; }
 .card__swatch {
   width: 12px; height: 12px;
   border: 1px solid var(--c-text-20);
   border-radius: 50%;
+}
+/* Shopify ne fournit pas de code couleur : on affiche le nom reel. */
+.card__swatch-name {
+  font-size: var(--fs-body-xs, 0.7rem);
+  color: var(--c-text-60);
+  border: 1px solid var(--c-text-20);
+  border-radius: 999px;
+  padding: 0.05rem 0.4rem;
+  white-space: nowrap;
 }
 
 .card__rating { display: flex; align-items: center; gap: 0.3rem; margin-top: 0.35rem; }
@@ -1236,6 +1248,18 @@ h4 { font-size: var(--fs-h4); }
 .swatch input:disabled + .swatch__inner { opacity: 0.35; cursor: not-allowed; }
 .swatch input:focus-visible + .swatch__inner { outline: 2px solid var(--c-accent); outline-offset: 3px; }
 
+/* Sans code couleur reel, le selecteur affiche le nom de la couleur. */
+.swatch--name { width: auto; height: auto; }
+.swatch__label {
+  display: inline-block;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--c-text-20);
+  font-size: var(--fs-body-s);
+  white-space: nowrap;
+}
+.swatch input:checked + .swatch__label { border-color: var(--c-text); outline: 1px solid var(--c-text); outline-offset: 2px; }
+.swatch input:disabled + .swatch__label { opacity: 0.35; cursor: not-allowed; }
+
 .sizes { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .size { position: relative; }
 .size input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
@@ -1395,7 +1419,7 @@ img.is-loading { opacity: 0; }
   .burger:hover { background: var(--c-bg-meta); }
   .burger svg { width: 20px; height: 20px; }
   .nav-toggle-label { display: none; }
-  .header__logo img { max-height: 36px; }
+  .header__logo img { width: clamp(112px, 30vw, 150px); }
   .hide-tablet { display: none !important; }
 }
 

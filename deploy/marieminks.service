@@ -1,0 +1,87 @@
+# Service systemd pour le site Marie Minks.
+#
+# A installer dans /etc/systemd/system/marieminks.service
+#   sudo cp deploy/marieminks.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now marieminks
+#
+# Commandes utiles :
+#   sudo systemctl status marieminks      voir l'etat
+#   sudo systemctl restart marieminks     redemarrer apres un changement
+#   sudo journalctl -u marieminks -f      voir les journaux en direct
+#   sudo journalctl -u marieminks --since today
+#
+# Pour voir le mot de passe du premier compte, au demarrage uniquement :
+#   sudo journalctl -u marieminks -n 30 --no-pager
+
+[Unit]
+Description=Site Marie Minks
+Documentation=https://marieminks.co.uk
+# Le service demarre apres le reseau : sans cela, Node peut ne pas
+#voir les interfaces au moment du demarrage sur un VPS lent.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+
+# --- Utilisateur dedie -----------------------------------------------------
+# Le service ne tourne PAS en root. C'est la premiere des precautions :
+# une faille dans le site ne donne pas les privileges administrateur.
+User=marieminks
+Group=marieminks
+
+WorkingDirectory=/srv/marieminks
+
+# --- Configuration ---------------------------------------------------------
+EnvironmentFile=/etc/marieminks/marieminks.env
+
+# --- Demarrage -------------------------------------------------------------
+# --reset-password ne doit PAS etre ici : ce drapeau affiche un mot de
+# passe et termine le processus, ce qui ferait tomber le service.
+ExecStart=/usr/bin/node /srv/marieminks/server.js
+
+# --- Redemarrage automatique ------------------------------------------------
+Restart=always
+RestartSec=5
+# Si le serveur plante en boucle, on arrete d'insister plutot que de
+# saturer la machine et les journaux.
+StartLimitBurst=5
+StartLimitIntervalSec=60
+
+# --- Journalisation --------------------------------------------------------
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=marieminks
+
+# --- Durcissement ----------------------------------------------------------
+# Le processus n'a besoin que de lire ses fichiers et d'ecrire dans data/.
+# Tout le reste lui est refuse par le noyau, pas par le code.
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+ProtectProc=invisible
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+# Seule exception : data/ doit rester inscriptible.
+ReadWritePaths=/srv/marieminks/data
+LockPersonality=true
+MemoryDenyWriteExecute=true
+
+# --- Limites ---------------------------------------------------------------
+# Une boutique ne devrait jamais depasser 300 Mo. Cette limite protege le
+# VPS si une requete manipule erroneusement une image.
+MemoryMax=300M
+# Au-dela, le service est tue puis relance : evite de rester en erreur.
+MemorySwapMax=512M
+
+[Install]
+WantedBy=multi-user.target

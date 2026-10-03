@@ -131,12 +131,14 @@
     zoom: '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M6 11h10M11 6v10M16.2 16.2 21 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'
   };
 
-  const BADGES = {
-    "ships-fast": { label: "Ships fast", cls: "" },
-    "sustainable-materials": { label: "Sustainable", cls: "badge--sust" },
-    "best-seller": { label: "Best seller", cls: "" },
-    "new": { label: "New", cls: "" }
-  };
+const BADGES = {
+  "ships-fast": { label: "Ships fast", cls: "" },
+  "sustainable-materials": { label: "Sustainable", cls: "badge--sust" },
+  "best-seller": { label: "Best Seller", cls: "" },
+  "sale": { label: "Sale", cls: "badge--sust" },
+  "exclusive": { label: "Exclusive", cls: "" },
+  "new": { label: "New", cls: "" }
+};
 
   /* ---------------------------------------------------------------- 4. En-tête */
 
@@ -186,7 +188,7 @@
 
       <div class="header__logo">
         <a href="${U("index.html")}" aria-label="Marie Minks — home">
-          <img src="${A("img/logo.svg")}" alt="Marie Minks" width="180" height="44">
+          <img src="${A("img/logo.svg")}" alt="Marie Minks" class="header__mark" width="205" height="113">
         </a>
       </div>
 
@@ -499,7 +501,7 @@ ${
 <div class="totals__row"><span>Subtotal</span><span>${money(subtotal)}</span></div>
 <div class="totals__row totals__row--total"><span>Total</span><span>${money(subtotal)}</span></div>
 </div>
-<p class="form-note" style="margin-top:-0.5rem;margin-bottom:0.85rem;">Made to order &middot; 10&ndash;14 days. Taxes and shipping calculated at checkout.</p>
+<p class="form-note" style="margin-top:-0.5rem;margin-bottom:0.85rem;">Made to order &middot; up to 15 days. Shipping and any duty are calculated at checkout.</p>
 <a class="btn btn-primary btn-block" href="${U("pages/checkout.html")}">Checkout</a>
 <button class="btn btn-tertiary btn-block" type="button" data-close-cart style="margin-top:0.5rem;">Continue shopping</button>
 </div>`
@@ -562,9 +564,13 @@ ${
     const badges = [];
     if (p.compareAt && p.compareAt > p.price) {
       badges.push(`<span class="badge badge--sale">Save ${money(p.compareAt - p.price)}</span>`);
-    } else if (p.badge && BADGES[p.badge]) {
-      badges.push(`<span class="badge ${BADGES[p.badge].cls}">${BADGES[p.badge].label}</span>`);
     }
+    /* Shopify affiche autant de badges de collection que le produit en porte ;
+       on en limite l'affichage a deux comme le fait le theme en ligne. */
+    const marks = Array.isArray(p.badges) && p.badges.length ? p.badges : (p.badge ? [p.badge] : []);
+    marks.slice(0, 2).forEach((b) => {
+      if (BADGES[b]) badges.push(`<span class="badge ${BADGES[b].cls}">${BADGES[b].label}</span>`);
+    });
     if (p.badge === "ships-fast") badges.push('<span class="badge badge--sold">Made to order</span>');
 
     card.innerHTML = `
@@ -588,7 +594,9 @@ ${p.rating ? `<div class="card__rating">${ICON.star}<span>${p.rating} (${p.revie
 ${
   p.colors && p.colors.length > 1
     ? `<div class="card__swatches">${p.colors
-        .map((c) => `<span class="card__swatch" style="background:${esc(c.hex)}" title="${esc(c.name)}"></span>`)
+        .map((c) => (c.hex
+          ? `<span class="card__swatch" style="background:${esc(c.hex)}" title="${esc(c.name)}"></span>`
+          : `<span class="card__swatch-name">${esc(c.name)}</span>`))
         .join("")}</div>`
     : ""
 }
@@ -1131,9 +1139,11 @@ ${items
         }
       </div>
 
-      <div class="product__rating">
-        ${ICON.star}<span>${p.rating} &middot; <a href="#reviews">${p.reviews} reviews</a></span>
-      </div>
+      ${
+        p.rating
+          ? `<div class="product__rating">${ICON.star}<span>${p.rating} &middot; <a href="#reviews">${p.reviews} reviews</a></span></div>`
+          : ""
+      }
 
       <p class="product__desc">${esc(p.short)}</p>
 
@@ -1148,13 +1158,15 @@ ${items
 <div class="variant__label"><span>Colour</span><b data-color-name>${esc(p.colors[0].name)}</b></div>
 <div class="swatches">
 ${p.colors
-  .map(
-    (c, i) => `<label class="swatch" title="${esc(c.name)}">
+          .map(
+            (c, i) => `<label class="swatch${c.hex ? "" : " swatch--name"}" title="${esc(c.name)}">
 <input type="radio" name="color" value="${esc(c.name)}"${i === 0 && inStock ? " checked" : ""}${inStock ? "" : " disabled"}>
-<span class="swatch__inner" style="background:${esc(c.hex)}"></span>
+${c.hex
+  ? `<span class="swatch__inner" style="background:${esc(c.hex)}"></span>`
+  : `<span class="swatch__label">${esc(c.name)}</span>`}
 </label>`
-  )
-  .join("")}
+          )
+          .join("")}
 </div>
 </div>`
           : ""
@@ -1221,11 +1233,12 @@ ${p.sizes
           <summary>Shipping &amp; returns</summary>
           <div class="accordion__body">
             <div class="ship-boxes">
-              <div class="ship-box"><b>UK</b><span>Next working day</span></div>
+              <div class="ship-box"><b>UK</b><span>Next working day (order before 10am)</span></div>
               <div class="ship-box"><b>Europe</b><span>2&ndash;4 working days</span></div>
               <div class="ship-box"><b>Worldwide</b><span>3&ndash;7 working days</span></div>
             </div>
-            <p style="margin-top:1rem;">Production takes 10&ndash;14 days before dispatch. Returns are accepted within 30 days on unworn pieces with tags attached. Bespoke and made-to-measure pieces are final sale.</p>
+            <p style="margin-top:1rem;">Production takes up to 15 days before dispatch. UK orders travel with Parcelforce, international orders with DHL, and every delivery is tracked and signed for. Returns are accepted within 30 days on unworn pieces with tags attached. Bespoke and made-to-measure pieces are final sale.</p>
+            <p style="margin-top:.75rem;">International shipping does not include custom or duty fees &mdash; these are paid by you on delivery.</p>
             <p><a href="${U("pages/shipping-returns.html")}">Full shipping &amp; returns policy</a></p>
           </div>
         </details>
@@ -1247,7 +1260,7 @@ ${p.sizes
         <p class="eyebrow">You may also like</p>
         <h2 class="section__title">Complete the look</h2>
       </div>
-      <a class="link-arrow" href="${U("collection.html?c=" + p.collections[0])}">View all ${ICON.arrow}</a>
+      <a class="link-arrow" href="${U(p.collections.length ? "collection.html?c=" + p.collections[0] : "collection.html")}">View all ${ICON.arrow}</a>
     </div>
     <div class="grid-products grid-products--4" data-related-grid></div>
   </section>

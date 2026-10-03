@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, follow">
+<title>Page not found — Marie Minks</title>
+<link rel="icon" href="/assets/img/favicon.ico" sizes="any">
+<link rel="icon" href="/assets/img/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+  /* Cette page doit tenir debout toute seule : si la feuille de style
+     principale est introuvable, on ne doit pas laisser une page nue. */
+  .errpage {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 1.5rem;
+    gap: 1.25rem;
+  }
+  .errpage__code {
+    font-size: clamp(3.5rem, 12vw, 7rem);
+    line-height: 1;
+    letter-spacing: .02em;
+    font-weight: 400;
+  }
+  .errpage__title { font-size: 1.5rem; margin: 0; }
+  .errpage__text {
+    max-width: 34rem;
+    color: var(--c-text-60);
+    font-size: .9375rem;
+    line-height: 1.7;
+  }
+  .errpage__actions { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: center; margin-top: .5rem; }
+  .errpage__links {
+    display: flex; flex-wrap: wrap; gap: 1.25rem; justify-content: center;
+    margin-top: 1.5rem; padding-top: 1.75rem;
+    border-top: 1px solid var(--c-border);
+    font-size: .8125rem;
+  }
+  .errpage__links a { color: var(--c-text-60); text-decoration: none; border-bottom: 1px solid transparent; }
+  .errpage__links a:hover { color: var(--c-text); border-color: currentColor; }
+</style>
+</head>
+<body>
+  <main class="errpage">
+    <p class="errpage__code" id="code">404</p>
+    <h1 class="errpage__title" id="title">This piece has moved on</h1>
+    <p class="errpage__text" id="text">
+      The page you were looking for does not exist, or the link is out of date.
+      The collection is still here.
+    </p>
+    <div class="errpage__actions">
+      <a class="btn btn-primary" href="/collection.html">Browse the collection</a>
+      <a class="btn btn-secondary" href="/">Back to home</a>
+    </div>
+    <nav class="errpage__links">
+      <a href="/collection.html?c=luxury-mink-coats">Luxury mink coats</a>
+      <a href="/pages/contact.html">Contact us</a>
+      <a href="/pages/shipping-returns.html">Shipping &amp; returns</a>
+    </nav>
+  </main>
+</body>
+</html>

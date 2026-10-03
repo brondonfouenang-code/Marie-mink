@@ -127,7 +127,8 @@ a { color: inherit; }
 }
 
 .side__brand { display: flex; align-items: center; gap: .6rem; padding: 0 .6rem; }
-.side__brand img { height: 30px; }
+/* Crest horizontal : meme ratio que le logo du site public. */
+.side__brand img { width: auto; height: 34px; }
 .side__brand b { font-size: .8125rem; font-weight: 600; }
 .side__brand span { display: block; font-size: .6875rem; color: var(--muted); font-weight: 400; }
 

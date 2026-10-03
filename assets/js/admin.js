@@ -37,6 +37,20 @@
       .replace(/"/g, "&quot;");
   }
 
+  /* Une photo produit peut etre en .jpg, .webp ou .png : on essaie dans
+     l'ordre, comme le fait la vitrine. Sans photo, on garde la vignette vide. */
+  function thumbImg(base, alt) {
+    if (!base) return '<div class="prod__thumb"></div>';
+    return (
+      '<img class="prod__thumb" alt="' + esc(alt || "") + '" loading="lazy"' +
+      ' src="/images/' + esc(base) + '.jpg" data-ext="0"' +
+      ' onerror="var e=[&quot;webp&quot;,&quot;png&quot;],i=+this.dataset.ext;' +
+      "if(i<e.length){this.dataset.ext=i+1;" +
+      "this.src=this.src.replace(/\\.[a-z0-9]+$/,'.'+e[i]);}" +
+      'else{this.style.visibility=&quot;hidden&quot;}">'
+    );
+  }
+
   function when(iso) {
     if (!iso) return "—";
     const d = new Date(iso);
@@ -927,7 +941,7 @@ $("#logoutBtn").addEventListener("click", async () => {
       .map((p) => {
         const idx = S.products.indexOf(p);
         const thumb = (p.images || [])[0];
-        const img = thumb ? '<img class="prod__thumb" src="/images/' + esc(thumb) + '.jpg" alt="" loading="lazy">' : '<div class="prod__thumb"></div>';
+        const img = thumbImg(thumb, p.title);
         const stock =
           p.stock === "out"
             ? '<span class="tag tag--err">Rupture</span>'
@@ -1341,7 +1355,7 @@ $("#logoutBtn").addEventListener("click", async () => {
     const confirm = $("#pw_confirm").value;
 
     if (!current) return pwStatus("Saisis ton mot de passe actuel.", true);
-    if (next.length < 8) return pwStatus("Le nouveau mot de passe doit faire au moins 8 caracteres.", true);
+    if (next.length < 10) return pwStatus("Le nouveau mot de passe doit faire au moins 10 caracteres.", true);
     if (next !== confirm) return pwStatus("Les deux nouveaux mots de passe ne correspondent pas.", true);
     if (next === current) return pwStatus("Le nouveau mot de passe est identique a l'ancien.", true);
 
