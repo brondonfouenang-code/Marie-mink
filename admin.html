@@ -14,7 +14,30 @@
 <!-- PORTE DE CONNEXION                                                     -->
 <!-- ===================================================================== -->
 <div class="gate" id="gate" hidden>
-  <form class="gate__box" id="loginForm" autocomplete="on">
+  <!-- Creation du compte : affichee uniquement tant qu'aucun administrateur
+       n'existe. Le serveur refuse toute creation ensuite. -->
+  <form class="gate__box" id="setupForm" autocomplete="off" hidden>
+    <h1>Creer le compte</h1>
+    <p>Marie Minks — premiere utilisation</p>
+
+    <label for="su_email">Email *</label>
+    <input type="email" id="su_email" name="email" autocomplete="email" required
+           placeholder="ton@email.fr">
+
+    <label for="su_pw">Mot de passe *</label>
+    <input type="password" id="su_pw" name="new-password" autocomplete="new-password" required>
+
+    <label for="su_pw2">Confirmer le mot de passe *</label>
+    <input type="password" id="su_pw2" name="new-password" autocomplete="new-password" required>
+
+    <p class="gate__hint">10 caracteres minimum. Choisis un mot de passe que tu n'utilises pas ailleurs.<br>
+      L'email sert uniquement a recuperer ton mot de passe si tu l'oublies.</p>
+
+    <button class="btn btn--primary btn--full" type="submit" id="setupBtn">Creer mon compte</button>
+    <div class="gate__err" id="setupErr" hidden></div>
+  </form>
+
+  <form class="gate__box" id="loginForm" autocomplete="on" hidden>
     <h1>Administration</h1>
     <p>Marie Minks — espace prive</p>
 
@@ -23,6 +46,42 @@
 
     <button class="btn btn--primary btn--full" type="submit" id="loginBtn">Se connecter</button>
     <div class="gate__err" id="loginErr" hidden></div>
+    <p class="gate__hint"><button type="button" class="gate__link" id="forgotBtn">Mot de passe oublie&nbsp;?</button></p>
+    <p class="gate__hint"><a href="/" class="gate__back">Retour au site</a></p>
+  </form>
+
+  <!-- Mot de passe oublie : on demande l'email, un lien est envoye. --->
+  <form class="gate__box" id="forgotForm" autocomplete="on" hidden>
+    <h1>Mot de passe oublie</h1>
+    <p>Marie Minks — on t'envoie un lien</p>
+
+    <label for="fg_email">Ton email</label>
+    <input type="email" id="fg_email" name="email" autocomplete="email" required
+           placeholder="ton@email.fr">
+
+    <button class="btn btn--primary btn--full" type="submit" id="forgotBtn2">Envoyer le lien</button>
+    <div class="gate__err" id="forgotErr" hidden></div>
+    <p class="gate__hint">
+      Si un compte existe avec cette adresse, tu recois un lien valable 1 heure.
+    </p>
+    <p class="gate__hint"><button type="button" class="gate__link" id="forgotBack">Revenir a la connexion</button></p>
+  </form>
+
+  <!--.arrivee du lien de recuperation : nouveau mot de passe --------->
+  <form class="gate__box" id="resetForm" autocomplete="off" hidden>
+    <h1>Nouveau mot de passe</h1>
+    <p>Marie Minks — choisis un nouveau mot de passe</p>
+
+    <label for="rs_pw">Mot de passe *</label>
+    <input type="password" id="rs_pw" name="new-password" autocomplete="new-password" required>
+
+    <label for="rs_pw2">Confirmer le mot de passe *</label>
+    <input type="password" id="rs_pw2" name="new-password" autocomplete="new-password" required>
+
+    <p class="gate__hint">10 caracteres minimum.</p>
+
+    <button class="btn btn--primary btn--full" type="submit" id="resetBtn">Enregistrer et me connecter</button>
+    <div class="gate__err" id="resetErr" hidden></div>
   </form>
 </div>
 

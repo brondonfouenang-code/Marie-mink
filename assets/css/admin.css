@@ -86,6 +86,30 @@ a { color: inherit; }
   font-size: .8125rem;
 }
 
+.gate__hint {
+  margin: -.25rem 0 1.1rem;
+  font-size: .75rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, .38);
+}
+.gate__hint--strong { color: rgba(255, 255, 255, .62); }
+.gate__back { color: rgba(255, 255, 255, .45); text-decoration: none; }
+.gate__back:hover { color: #fff; text-decoration: underline; }
+
+/* Les liens d'action (mot de passe oublie, retour) sont des boutons :
+   ils ne doivent pas avoir l'air d'un bouton plein. */
+.gate__link {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: rgba(255, 255, 255, .55);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.gate__link:hover { color: #fff; }
+
 /* --- Coquille --- */
 .app { display: grid; grid-template-columns: 232px 1fr; min-height: 100dvh; }
 

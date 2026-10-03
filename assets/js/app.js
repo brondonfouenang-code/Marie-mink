@@ -235,7 +235,7 @@
 
       <div class="mobile-nav__foot">
         <a href="${U("pages/account.html")}" style="display:block;padding:0.6rem 0;">Your order</a>
-        <a href="${U("pages/contact.html")}" style="display:block;padding:0.6rem 0;">+44 7386 156525</a>
+        <a href="${U("pages/contact.html")}" style="display:block;padding:0.6rem 0;">+44 7723 143962</a>
         <div style="margin-top:1rem;">
           <div class="currency-select">
             <select data-currency aria-label="Currency">${currencyOptions}</select>
@@ -670,7 +670,7 @@ ${
           help you find exactly what you are looking for.
         </p>
         <div class="footer__contact">
-          <a href="tel:+447386156525">+44 7386 156525</a>
+          <a href="tel:+447723143962">+44 7723 143962</a>
           <a href="${U("pages/contact.html")}">Send us a message</a>
         </div>
       </div>
@@ -700,11 +700,17 @@ ${
 
     <div class="footer__bottom">
       <span>Copyright &copy; ${new Date().getFullYear()} Marie Minks &mdash; All rights reserved.</span>
-      <div class="payments">
-        ${PAYMENTS.map(
-          (name) =>
-            `<span title="${name}" style="display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:24px;padding:0 6px;border:1px solid rgba(255,255,255,0.22);border-radius:3px;font-size:9px;letter-spacing:.06em;">${name.toUpperCase()}</span>`
-        ).join("")}
+      <div class="footer__bottom-end">
+        <!-- Acces reserve a l'equipe : discret, en bas de page comme dans
+             la plupart des boutiques. Ce n'est pas une protection, c'est
+             seulement une commodite : la vraie securite est le mot de passe. -->
+        <a class="footer__staff" href="${U("admin.html")}" rel="nofollow">Staff login</a>
+        <div class="payments">
+          ${PAYMENTS.map(
+            (name) =>
+              `<span title="${name}" style="display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:24px;padding:0 6px;border:1px solid rgba(255,255,255,0.22);border-radius:3px;font-size:9px;letter-spacing:.06em;">${name.toUpperCase()}</span>`
+          ).join("")}
+        </div>
       </div>
     </div>
   </div>
@@ -1582,7 +1588,7 @@ ${p.sizes
 <p class="feature__desc">${esc(p.short)}</p>
 <div class="feature__actions">
 <a class="btn btn-primary" href="${U("product.html?p=" + p.slug)}">View piece</a>
-<a class="btn btn-secondary" href="https://wa.me/447386156525" target="_blank" rel="noopener">Ask about sizing</a>
+<a class="btn btn-secondary" href="https://wa.me/447723143962" target="_blank" rel="noopener">Ask about sizing</a>
 </div>
 </div>`;
       const slot = $("[data-img]", mount);

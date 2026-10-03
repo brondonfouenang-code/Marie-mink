@@ -942,6 +942,19 @@ h4 { font-size: var(--fs-h4); }
 .payments { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
 .payments svg { height: 24px; width: auto; opacity: 0.75; }
 
+.footer__bottom-end { display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; }
+.footer__staff {
+  color: rgba(207, 197, 180, 0.7);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(207, 197, 180, 0.3);
+  padding-bottom: 1px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.footer__staff:hover { color: var(--c-bg); border-color: currentColor; }
+@media (max-width: 599px) {
+  .footer__bottom-end { gap: 1rem; width: 100%; justify-content: space-between; }
+}
+
 /* --- 21. Tiroir panier -------------------------------------------------- */
 .drawer {
   position: fixed;

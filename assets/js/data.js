@@ -785,7 +785,7 @@ const REVIEWS = [
 /* --- Barre d'annonce --------------------------------------------------- */
 const ANNOUNCEMENTS = [
   "Made to order · 10–14 days production",
-  "Price match on the same quality furs · <a href=\"tel:+447386156525\">WhatsApp +44 7386 156525</a>",
+  "Price match on the same quality furs · <a href=\"tel:+447723143962\">WhatsApp +44 7723 143962</a>",
   "Every piece gift boxed · never a poly bag",
   "Pay over six months · Klarna & Clearpay at checkout"
 ];

@@ -111,49 +111,242 @@
 
   /* ------------------------------------------------------------ Connexion */
 
-  function showGate() {
-    $("#gate").hidden = false;
-    $("#app").hidden = true;
-    setTimeout(() => $("#pw") && $("#pw").focus(), 30);
+const setupForm = $("#setupForm");
+const loginForm = $("#loginForm");
+const forgotForm = $("#forgotForm");
+const resetForm = $("#resetForm");
+
+/** Jeton de recuperation lu dans l'URL, conserve pour l'envoi du formulaire. */
+let RESET_TOKEN = "";
+
+/** Les quatre formulaires de la porte, dans l'ordre d'affichage. */
+const GATE_FORMS = [setupForm, loginForm, forgotForm, resetForm];
+
+function showGate() {
+  $("#gate").hidden = false;
+  $("#app").hidden = true;
+  /* On repart d'un etat propre : tous les formulaires sont masques puis
+     gateMode() n'affiche que celui qui convient. Sans cela, apres une
+     creation ou une deconnexion, le formulaire de creation resterait
+     affiche et laisserait croire qu'on peut creer un second compte. */
+  GATE_FORMS.forEach((f) => (f.hidden = true));
+  ["loginErr", "setupErr", "forgotErr", "resetErr"].forEach((id) => ($("#" + id).hidden = true));
+  setTimeout(() => $("#pw") && $("#pw").focus(), 30);
+}
+
+function showApp() {
+  $("#gate").hidden = true;
+  $("#app").hidden = false;
+  /* Les formulaires disparaissent avec la porte. On les masque quand
+     meme : sinon la creation resterait cochee dans la page et resurgirait
+     a la prochaine deconnexion. */
+  GATE_FORMS.forEach((f) => (f.hidden = true));
+}
+
+/** N'affiche que le formulaire demande, tous les autres etant masques. */
+function showOnly(form, focusId) {
+  GATE_FORMS.forEach((f) => (f.hidden = f !== form));
+  if (focusId) setTimeout(() => { const el = $("#" + focusId); if (el) el.focus(); }, 30);
+}
+
+/* -------------------------------------------------------- Mise en route */
+
+/**
+ * Tant qu'aucun administrateur n'existe, on propose la creation du compte.
+ * Le serveur refuse ensuite toute creation : cette porte se ferme pour de bon.
+ */
+async function gateMode() {
+  /* Un lien de recuperation peut etre arrive dans l'URL : dans ce cas on
+     montre le formulaire de nouveau mot de passe, quelle que soit la
+     situation du compte. */
+  const token = new URLSearchParams(location.search).get("reset");
+  if (token) {
+    RESET_TOKEN = token;
+    showOnly(resetForm, "rs_pw");
+    return false;
   }
 
-  function showApp() {
-    $("#gate").hidden = true;
-    $("#app").hidden = false;
+  let needsSetup = false;
+  try {
+    const r = await api("/setup/status");
+    needsSetup = !!r.needsSetup;
+  } catch (e) {
+    /* Si le statut est indisponible, on ne montre pas la creation : on
+       propose la connexion, ce qui echouera proprement si besoin. */
+    needsSetup = false;
   }
 
-  $("#loginForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const btn = $("#loginBtn");
-    const err = $("#loginErr");
-    err.hidden = true;
-    btn.disabled = true;
-    btn.textContent = "Connexion…";
+  if (needsSetup) showOnly(setupForm, "su_email");
+  else showOnly(loginForm, "pw");
 
-    try {
-      await api("/login", { json: { password: $("#pw").value } });
-      $("#pw").value = "";
-      showApp();
-      await loadAll();
-      toast("Connecte");
-    } catch (ex) {
-      err.textContent = ex.message;
-      err.hidden = false;
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "Se connecter";
-    }
-  });
+  return needsSetup;
+}
 
-  $("#logoutBtn").addEventListener("click", async () => {
-    try {
-      await api("/logout", { method: "POST" });
-    } catch (e) {
-      /* on deconnecte quand meme */
-    }
-    showGate();
-    toast("Deconnecte");
-  });
+setupForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = $("#setupBtn");
+  const err = $("#setupErr");
+  err.hidden = true;
+
+  const email = $("#su_email").value.trim();
+  const pw = $("#su_pw").value;
+  const pw2 = $("#su_pw2").value;
+
+  const fail = (msg) => {
+    err.textContent = msg;
+    err.hidden = false;
+  };
+
+  /* Meme regle que celle du serveur, pour ne pas envoyer une requete
+     qu'il refusera. */
+  if (!email) return fail("Renseigne ton email.");
+  if (!/^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/.test(email)) return fail("Adresse email invalide.");
+  if (pw.length < 10) return fail("Le mot de passe doit faire au moins 10 caracteres.");
+  if (pw !== pw2) return fail("Les deux mots de passe ne correspondent pas.");
+
+  btn.disabled = true;
+  btn.textContent = "Creation…";
+
+  try {
+    await api("/setup", { method: "POST", json: { email, password: pw } });
+    $("#su_email").value = "";
+    $("#su_pw").value = "";
+    $("#su_pw2").value = "";
+    showApp();
+    await loadAll();
+    toast("Compte cree — bienvenue");
+  } catch (ex) {
+    fail(ex.message);
+    /* Si le serveur dit qu'un administrateur existe deja, on repasse
+       en mode connexion plutot que de laisser un message sans issue. */
+    if (/existe deja/i.test(ex.message)) await gateMode();
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Creer mon compte";
+  }
+});
+
+loginForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = $("#loginBtn");
+  const err = $("#loginErr");
+  err.hidden = true;
+  btn.disabled = true;
+  btn.textContent = "Connexion…";
+
+  try {
+    await api("/login", { json: { password: $("#pw").value } });
+    $("#pw").value = "";
+    showApp();
+    await loadAll();
+    toast("Connecte");
+  } catch (ex) {
+    err.textContent = ex.message;
+    err.hidden = false;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Se connecter";
+  }
+});
+
+/* --- Mot de passe oublie ------------------------------------------------ */
+
+$("#forgotBtn").addEventListener("click", () => {
+  /* L'email n'est pas pre-rempli : le serveur ne le revele jamais, sinon
+     n'importe quel visiteur pourrait apprendre quelle adresse possede le
+     compte. On demande a l'admin de le saisir une fois. */
+  $("#fg_email").value = "";
+  showOnly(forgotForm, "fg_email");
+});
+
+$("#forgotBack").addEventListener("click", async () => {
+  await gateMode();
+});
+
+forgotForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = $("#forgotBtn2");
+  const err = $("#forgotErr");
+  err.hidden = true;
+  const email = $("#fg_email").value.trim();
+
+  if (!/^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/.test(email)) {
+    err.textContent = "Adresse email invalide.";
+    err.hidden = false;
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Envoi…";
+
+  try {
+    await api("/setup/forgot", { method: "POST", json: { email } });
+    /* Message identique que l'email existe ou non : cette page ne doit pas
+       permettre de deviner quelle adresse possede le compte. */
+    $("#fg_email").value = "";
+    showOnly(loginForm, "pw");
+    toast("Si un compte existe, le lien est parti");
+  } catch (ex) {
+    err.textContent = ex.message;
+    err.hidden = false;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Envoyer le lien";
+  }
+});
+
+resetForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = $("#resetBtn");
+  const err = $("#resetErr");
+  err.hidden = true;
+  const pw = $("#rs_pw").value;
+  const pw2 = $("#rs_pw2").value;
+
+  const fail = (msg) => {
+    err.textContent = msg;
+    err.hidden = false;
+  };
+
+  if (!RESET_TOKEN) return fail("Ce lien est invalide ou a expire.");
+  if (pw.length < 10) return fail("Le mot de passe doit faire au moins 10 caracteres.");
+  if (pw !== pw2) return fail("Les deux mots de passe ne correspondent pas.");
+
+  btn.disabled = true;
+  btn.textContent = "Enregistrement…";
+
+  try {
+    await api("/setup/reset", { method: "POST", json: { token: RESET_TOKEN, password: pw } });
+    /* On retire le jeton de l'URL : il ne doit pas rester dans l'historique
+       du navigateur, ni permettre un simple rafraichissement. */
+    RESET_TOKEN = "";
+    history.replaceState(null, "", location.pathname);
+    $("#rs_pw").value = "";
+    $("#rs_pw2").value = "";
+    showApp();
+    await loadAll();
+    toast("Mot de passe change — connecte");
+  } catch (ex) {
+    fail(ex.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Enregistrer et me connecter";
+  }
+});
+
+$("#logoutBtn").addEventListener("click", async () => {
+  try {
+    await api("/logout", { method: "POST" });
+  } catch (e) {
+    /* on deconnecte quand meme */
+  }
+  showGate();
+  /* showGate masque tous les formulaires : il faut redemander au serveur
+     lequel proposer. Ici un compte existe toujours, donc c'est la
+     connexion, mais on ne suppose pas. */
+  await gateMode();
+  toast("Deconnecte");
+});
 
   /* ------------------------------------------------------------ Navigation */
 
@@ -1215,9 +1408,12 @@
         await loadAll();
       } else {
         showGate();
+        /* On demande au serveur s'il reste un compte a creer. */
+        await gateMode();
       }
     } catch (e) {
       showGate();
+      await gateMode();
     }
   })();
 })();

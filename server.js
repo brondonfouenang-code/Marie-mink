@@ -106,7 +106,22 @@ function loadAdmin() {
      de secret inutile dans la console. */
   const viaSite = process.env.SETUP_MANAGED === "1";
 
-  if (!fs.existsSync(file) && !viaSite) {
+  /* ADMIN_PASSWORD fixe le mot de passe sans passer par la creation ni par la
+     console : pratique pour un hebergement ou une reprise apres une perte.
+     Il impose son mot de passe a chaque demarrage. */
+  const forced = process.env.ADMIN_PASSWORD;
+
+  if (forced) {
+    const salt = crypto.randomBytes(16).toString("hex");
+    writeJSON(file, { salt, hash: hashPassword(forced, salt), created: new Date().toISOString() });
+    box("COMPTE ADMIN DEFINI PAR L'ENVIRONNEMENT", [
+      "Mot de passe : celui de la variable ADMIN_PASSWORD.",
+      "",
+      "Pense a retirer ADMIN_PASSWORD du demarrage une fois le",
+      "mot de passe choisi, sinon il ecrasera tout changement",
+      "fait depuis l'admin."
+    ]);
+  } else if (!fs.existsSync(file) && !viaSite) {
     const salt = crypto.randomBytes(16).toString("hex");
     const plain = newPassword();
     writeJSON(file, { salt, hash: hashPassword(plain, salt), created: new Date().toISOString() });
@@ -118,9 +133,9 @@ function loadAdmin() {
     ]);
   }
 
-  const record = readJSON(file, null);
-  record.plainForced = !!process.env.ADMIN_PASSWORD;
-  return record;
+  /* En mode SETUP_MANAGED le fichier peut ne pas encore exister : le compte
+     sera cree depuis le site. On part donc d'un enregistrement vide. */
+  return readJSON(file, { salt: "", hash: "" });
 }
 
 /** L'administrateur a-t-il deja ete cree ? */
@@ -135,17 +150,46 @@ function adminExists() {
  * des que le fichier existe, et la creation automatique dans la console est
  * coupee avec SETUP_MANAGED=1.
  */
-function createAdmin(password) {
+function createAdmin(email, password) {
   const file = path.join(DATA_DIR, "admin.json");
   if (fs.existsSync(file)) return { ok: false, error: "Un administrateur existe deja" };
 
   const salt = crypto.randomBytes(16).toString("hex");
   writeJSON(file, {
+    email: String(email || "").trim().toLowerCase(),
     salt,
     hash: hashPassword(password, salt),
     created: new Date().toISOString()
   });
   return { ok: true };
+}
+
+/**
+ * Change le mot de passe a partir d'un jeton de recuperation.
+ * Le jeton est a usage unique et expire : il est compare en temps constant,
+ * puis retire du fichier pour ne jamais pouvoir etre rejoue.
+ */
+function applyResetToken(token, newPassword) {
+  const file = path.join(DATA_DIR, "admin.json");
+  const record = readJSON(file, null);
+  if (!record || !record.reset || !record.reset.hash || !record.reset.expires) return false;
+  if (Date.now() > record.reset.expires) {
+    delete record.reset;
+    writeJSON(file, record);
+    return false;
+  }
+  /* On re-hache le jeton presente avant de comparer : le fichier ne contient
+     que le hash, donc comparer directement le jeton a ce qui est stocke ne
+     fonctionnerait jamais. */
+  if (!sameHash(hashPassword(String(token || ""), record.salt), record.reset.hash)) return false;
+
+  const salt = crypto.randomBytes(16).toString("hex");
+  record.salt = salt;
+  record.hash = hashPassword(newPassword, salt);
+  /* Un seul jeton a la fois : on invalide les demandes en attente. */
+  delete record.reset;
+  writeJSON(file, record);
+  return true;
 }
 
 /** node server.js --reset-password : affiche un nouveau mot de passe. */
@@ -154,7 +198,12 @@ function resetAdminPassword() {
   const previous = readJSON(file, {});
   const salt = crypto.randomBytes(16).toString("hex");
   const plain = newPassword();
-  writeJSON(file, { salt, hash: hashPassword(plain, salt), created: previous.created || new Date().toISOString() });
+  writeJSON(file, {
+    email: previous.email || "",
+    salt,
+    hash: hashPassword(plain, salt),
+    created: previous.created || new Date().toISOString()
+  });
   box("MOT DE PASSE REINITIALISE", [
     "Mot de passe : " + plain,
     "",
@@ -185,6 +234,16 @@ function verifyPassword(password) {
 }
 
 /* ---------------------------------------------------------------- Sessions */
+
+/** Comparaison en temps constant : evite de fuiter le secret par le temps. */
+function sameHash(a, b) {
+  const bufA = Buffer.from(String(a));
+  const bufB = Buffer.from(String(b));
+  /* On compare des chaines de meme longueur pour que timingSafeEqual
+     n	throw pas. Un jeton de mauvaise longueur est rejete d'emblee. */
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
 
 function signToken(payload) {
   const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
@@ -501,6 +560,73 @@ function listImages() {
 const SEO_FILE = () => path.join(DATA_DIR, "seo.json");
 const SITE_URL = (process.env.SITE_URL || "https://www.marieminks.co.uk").replace(/\/$/, "");
 
+/* ------------------------------------------------- Envoi des emails ------- */
+
+/**
+ * Envoie le lien de recuperation.
+ *
+ * Aucun service d'email n'est livre avec ce projet, il n'y a donc pas de
+ * dependance a installer. Deux facons de faire :
+ *
+ *   1. RESEND_API_KEY + ADMIN_FROM definis -> l'email part vraiment, en
+ *      passant par l'API HTTP de Resend (fetch est fourni par Node 18+,
+ *      le projet n'ajoute aucune dependance).
+ *   2. Sinon -> le lien s'affiche dans la console du serveur. C'est utile
+ *      en local, et c'est aussi ce qui permet de ne jamais bloquer la
+ *      reception d'un email mal configure.
+ *
+ * L'echec d'envoi n'est volontairement pas remonte a l'appelant : la
+ * personne doit pouvoir recuperer son mot de passe meme si le service
+ * d'email est tombe.
+ */
+async function sendResetEmail(to, token) {
+  const link = SITE_URL + "/admin.html?reset=" + encodeURIComponent(token);
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.ADMIN_FROM;
+
+  if (apiKey && from) {
+    try {
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + apiKey },
+        body: JSON.stringify({
+          from,
+          to: [to],
+          subject: "Ton mot de passe — Marie Minks",
+          text:
+            "Bonjour,\n\n" +
+            "Tu as demande un nouveau mot de passe pour l'administration de Marie Minks.\n\n" +
+            "Clique sur ce lien (valable 1 heure) :\n" +
+            link +
+            "\n\nSi tu n'es pas a l'origine de cette demande, ignore ce message : " +
+            "ton mot de passe actuel reste valable.\n"
+        })
+      });
+      if (!res.ok) {
+        box("EMAIL NON ENVOYE", ["Statut Resend : " + res.status, "", "Lien a utiliser :", link]);
+      } else {
+        box("EMAIL DE RECUPERATION ENVOYE", ["Destinataire : " + to, "Lien valable 1 heure."]);
+      }
+      return;
+    } catch (e) {
+      box("EMAIL NON ENVOYE", ["Erreur : " + e.message, "", "Lien a utiliser :", link]);
+      return;
+    }
+  }
+
+  box("LIEN DE RECUPERATION (aucun service d'email configure)", [
+    "Destinataire  : " + to,
+    "",
+    "Lien (valable 1 heure) :",
+    link,
+    "",
+    "Pour que l'email parte vraiment, definis ces deux variables",
+    "avant de lancer le serveur :",
+    "  RESEND_API_KEY = cle API Resend",
+    "  ADMIN_FROM    = expéditeur, ex. \"Marie Minks <no-reply@domaine.fr>\""
+  ]);
+}
+
 function getSeo() {
   return readJSON(SEO_FILE(), {});
 }
@@ -623,7 +749,7 @@ function seoAudit() {
 const STATIC_PAGES = {
   "/pages/our-story.html": {
     title: "Our Story — Marie Minks",
-    desc: "Saga Furs top lot mink, cut and sewn to order in our own factory in Greece. Meet the maison behind every Marie Minks piece."
+    desc: "Every Marie Minks piece is cut to order at our workshop in Splalding, UK. Meet the people behind the coats."
   },
   "/pages/contact.html": {
     title: "Contact — Marie Minks",
@@ -719,13 +845,23 @@ function renderSeoHead(rel, query) {
     name: "Marie Minks",
     url: SITE_URL + "/",
     logo: SITE_URL + "/assets/img/logo.svg",
-    description: "Luxury mink coats and fur, cut and sewn to order in our own factory in Greece.",
-    sameAs: ["https://wa.me/447386156525"],
-    address: { "@type": "PostalAddress", addressCountry: "GR" },
+    description: "Luxury mink coats and fur, made to order at our workshop in Splalding, UK.",
+    sameAs: ["https://wa.me/447723143962"],
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Beck Bank",
+      addressLocality: "Splalding",
+      postalCode: "PE11 4LE",
+      addressCountry: "GB"
+    },
+    email: "marieminks6@gmail.com",
+    telephone: "+44 7723 143962",
     contactPoint: {
       "@type": "ContactPoint",
-      telephone: "+30",
+      telephone: "+44 7723 143962",
+      email: "marieminks6@gmail.com",
       contactType: "customer service",
+      areaServed: ["GB", "EU"],
       availableLanguage: ["English"]
     }
   };
@@ -736,9 +872,10 @@ function renderSeoHead(rel, query) {
 
   if (rel === "/" || rel === "/index.html") {
     const meta = seo["page:home"] || {};
-    title = meta.title || "Marie Minks — Luxury Mink Coats & Fur, Made to Order in Greece";
+    title = meta.title || "Marie Minks — Luxury Mink Coats & Fur, Made to Order in the UK";
     desc = meta.description ||
-      "Saga Furs top lot mink, cut and sewn to order in our own factory in Greece. Luxury mink coats, pattern mink, kids fur and accessories.";    canonical = canonicalFor("/");
+      "Marie Minks crafts luxury mink coats to order from our workshop in Splalding, UK. Pattern mink, kids fur and accessories.";
+    canonical = canonicalFor("/");
     ld = [
       org,
       {
@@ -1060,6 +1197,10 @@ function getLeads() {
 
 /* ---------------------------------------------------------------- API */
 
+/* Validation d'email volontairement simple : une adresse plausible suffit.
+   La verification reelle se fait en envoyant le lien de recuperation. */
+const EMAIL_RE = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/;
+
 /* Compteur d'echecs de connexion par IP (module scope : sinon il serait
    recree a chaque requete et ne compterait jamais rien). */
 const LOGIN_TRIES = Object.create(null);
@@ -1112,6 +1253,62 @@ async function handleApi(req, res, pathname) {
     return true;
   }
 
+  /* --- Mot de passe oublie : on envoie un lien par email ------------------
+     La reponse est toujours la meme, que l'email existe ou non : sinon
+     cette page permettrait de deviner quelle adresse possede le compte. --- */
+  if (route === "setup/forgot" && req.method === "POST") {
+    const ip = clientIp(req);
+    if (tooMany("forgot", ip, 5, 60 * 60 * 1000)) {
+      json(res, 429, { ok: false, error: "Trop de tentatives, reessayez plus tard." });
+      return true;
+    }
+
+    const body = await readJSONBody(req, 8 * 1024);
+    const asked = body && typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+    const record = readJSON(path.join(DATA_DIR, "admin.json"), null);
+
+    if (record && record.email && asked && sameHash(record.email, asked)) {
+      const token = crypto.randomBytes(24).toString("base64url");
+      record.reset = {
+        hash: hashPassword(token, record.salt),
+        expires: Date.now() + 60 * 60 * 1000
+      };
+      writeJSON(path.join(DATA_DIR, "admin.json"), record);
+      await sendResetEmail(record.email, token);
+    }
+
+    json(res, 200, { ok: true });
+    return true;
+  }
+
+  /* --- Application d'un nouveau mot de passe via un jeton recu par email -- */
+  if (route === "setup/reset" && req.method === "POST") {
+    const body = await readJSONBody(req, 8 * 1024);
+    const token = body && typeof body.token === "string" ? body.token : "";
+    const pw = body && typeof body.password === "string" ? body.password : "";
+
+    if (pw.length < 10 || pw.length > 200) {
+      json(res, 400, { ok: false, error: "Le mot de passe doit faire entre 10 et 200 caracteres." });
+      return true;
+    }
+    if (!applyResetToken(token, pw)) {
+      json(res, 400, { ok: false, error: "Ce lien est invalide ou a expire." });
+      return true;
+    }
+
+    /* Le mot de passe a change : les sessions ouvertes ne valent plus rien,
+       et on connecte immediatement avec le nouveau mot de passe. */
+    ADMIN = loadAdminNoCreate();
+    const fresh = signToken({ exp: Date.now() + SESSION_TTL, stamp: sessionStamp() });
+    send(res, 200, JSON.stringify({ ok: true }), {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
+      "Set-Cookie":
+        "mm_session=" + fresh + "; HttpOnly; Path=/; SameSite=Strict; Max-Age=" + Math.floor(SESSION_TTL / 1000)
+    });
+    return true;
+  }
+
   /* --- Mise en route : la creation du compte administrateur ---------------
      Publie, mais fermé dès qu'un administrateur existe. --- */
   if (route === "setup/status" && req.method === "GET") {
@@ -1136,6 +1333,14 @@ async function handleApi(req, res, pathname) {
 
     const body = await readJSONBody(req, 8 * 1024);
     const pw = body && typeof body.password === "string" ? body.password : "";
+    const email = body && typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+
+    /* L'email sert a la recuperation du mot de passe. On ne peut donc pas
+       s'en passer : un compte sans email serait irrecuperable. */
+    if (!EMAIL_RE.test(email)) {
+      json(res, 400, { ok: false, error: "Adresse email invalide." });
+      return true;
+    }
 
     /* 10 caracteres minimum : en dessous, une adresse IP peut etre forcee
        meme si le blocage anti-brenteforce est deja en place. */
@@ -1148,7 +1353,7 @@ async function handleApi(req, res, pathname) {
       return true;
     }
 
-    const made = createAdmin(pw);
+    const made = createAdmin(email, pw);
     if (!made.ok) {
       json(res, 409, { ok: false, error: made.error });
       return true;
@@ -1158,8 +1363,12 @@ async function handleApi(req, res, pathname) {
        avec ce qu'il vient de taper, inutile de le redemander. */
     ADMIN = loadAdminNoCreate();
     const token = signToken({ exp: Date.now() + SESSION_TTL, stamp: sessionStamp() });
-    res.setHeader("Set-Cookie", SESSION_COOKIE + "=" + token + "; Path=/; HttpOnly; SameSite=Lax; Max-Age=" + Math.floor(SESSION_TTL / 1000));
-    json(res, 200, { ok: true });
+    send(res, 200, JSON.stringify({ ok: true }), {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
+      "Set-Cookie":
+        "mm_session=" + token + "; HttpOnly; Path=/; SameSite=Strict; Max-Age=" + Math.floor(SESSION_TTL / 1000)
+    });
     return true;
   }
 
