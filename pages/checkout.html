@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout &ndash; Marie Minks</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=Jost:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+
+<body data-page="checkout">
+
+<div data-mm-header></div>
+<div data-mm-search></div>
+<div data-mm-cart></div>
+
+<main id="main">
+  <div class="container">
+    <nav class="banner" aria-label="Breadcrumb" style="padding-bottom:0">
+      <ol class="breadcrumbs">
+        <li><a href="../index.html">Home</a></li>
+        <li>Checkout</li>
+      </ol>
+    </nav>
+    <div class="page-head">
+      <h1 class="page-head__title">Checkout</h1>
+      <p class="page-head__text">Made to order &middot; 10&ndash;14 days in our factory before dispatch.</p>
+    </div>
+  </div>
+
+  <section class="section section--tight">
+    <div class="container">
+
+      <div class="promo" style="margin-bottom:2rem;background:var(--c-bg-meta);color:var(--c-text);border:1px dashed var(--c-border);">
+        <div>
+          <h2 class="promo__title" style="font-size:var(--fs-h3);font-family:var(--f-sans);font-weight:500;">Paiement de démonstration</h2>
+          <p class="promo__text" style="color:var(--c-text-80);">
+            Aucun paiement ne sera traité. Ce formulaire simule une commande pour que vous puissiez voir le
+            parcours complet. Branchez un vrai prestataire (Stripe, Shopify Checkout, PayPal) avant de vendre.
+          </p>
+        </div>
+      </div>
+
+      <div id="checkout-live">
+        <div class="contact-grid">
+
+          <form class="form-grid" data-form data-checkout novalidate>
+            <!-- Piege a robots : masque, jamais rempli par un humain -->
+            <div class="form-field" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;" aria-hidden="true">
+              <label for="c-website">Leave this field empty</label>
+              <input id="c-website" name="website" type="text" tabindex="-1" autocomplete="off">
+            </div>
+            <h2 style="font-size:var(--fs-h3);">Contact</h2>
+            <div class="form-row">
+              <div class="form-field">
+                <label for="c-email">Email *</label>
+                <input class="field" id="c-email" type="email" required autocomplete="email">
+              </div>
+              <div class="form-field">
+                <label for="c-phone">Phone *</label>
+                <input class="field" id="c-phone" type="tel" required autocomplete="tel">
+              </div>
+            </div>
+
+            <h2 style="font-size:var(--fs-h3);margin-top:1rem;">Shipping address</h2>
+            <div class="form-row">
+              <div class="form-field">
+                <label for="c-first">First name *</label>
+                <input class="field" id="c-first" type="text" required autocomplete="given-name">
+              </div>
+              <div class="form-field">
+                <label for="c-last">Last name *</label>
+                <input class="field" id="c-last" type="text" required autocomplete="family-name">
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="c-addr">Address *</label>
+              <input class="field" id="c-addr" type="text" required autocomplete="street-address">
+            </div>
+            <div class="form-field">
+              <label for="c-city">Town / city *</label>
+              <input class="field" id="c-city" type="text" required autocomplete="address-level2">
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label for="c-post">Postcode / ZIP *</label>
+                <input class="field" id="c-post" type="text" required autocomplete="postal-code">
+              </div>
+              <div class="form-field">
+                <label for="c-country">Country *</label>
+                <select class="field" id="c-country" required autocomplete="country-name">
+                  <option>United Kingdom</option>
+                  <option>Ireland</option>
+                  <option>France</option>
+                  <option>Germany</option>
+                  <option>Italy</option>
+                  <option>Spain</option>
+                  <option>Netherlands</option>
+                  <option>Greece</option>
+                  <option>United States</option>
+                  <option>Canada</option>
+                  <option>Australia</option>
+                  <option>United Arab Emirates</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="c-notes">Order notes</label>
+              <textarea class="field" id="c-notes" placeholder="Gift wrapping, a handwritten message, delivery instructions&hellip;"></textarea>
+            </div>
+
+            <h2 style="font-size:var(--fs-h3);margin-top:1rem;">Payment</h2>
+            <div class="form-field">
+              <label for="c-plan">Payment method</label>
+              <select class="field" id="c-plan">
+                <option>Bank transfer &mdash; 5% discount</option>
+                <option data-split>Card &mdash; pay in 6 interest-free instalments (Klarna / Clearpay)</option>
+                <option>Card &mdash; pay in full</option>
+              </select>
+            </div>
+
+            <div class="form-note" style="margin:0 0 1.25rem;padding:0.9rem 1rem;background:var(--c-bg-meta);border-left:2px solid var(--c-accent);">
+              <strong>No card details on this site.</strong> Placing your order opens a WhatsApp
+              conversation with our team, where we confirm the pieces, sizes and total with you and
+              send you a secure payment link. Card payment at checkout is on its way.
+            </div>
+
+            <button class="btn btn-primary" type="submit" id="checkout-submit">Continue to payment on WhatsApp</button>
+
+            <p class="form-error" data-form-err hidden>Please complete every required field, including a valid email.</p>
+            <p class="form-note">Your order is not final until we confirm it with you by message.</p>
+          </form>
+
+          <aside>
+            <div style="padding:1.5rem;background:var(--c-bg-meta);position:sticky;top:calc(var(--header-h) + 1.5rem);">
+              <h2 style="font-size:var(--fs-h3);margin-bottom:1.25rem;">Your order</h2>
+              <div data-checkout-lines></div>
+              <div class="totals" style="margin-top:1.25rem;">
+                <div class="totals__row"><span>Subtotal</span><span data-co-sub></span></div>
+                <div class="totals__row"><span>Shipping</span><span data-co-ship></span></div>
+                <div class="totals__row totals__row--total"><span>Total</span><span data-co-total></span></div>
+              </div>
+              <p class="form-note" style="margin-top:.85rem;">Duties included for UK and EU. Nothing extra on delivery.</p>
+              <a class="link-underline" href="../collection.html?c=luxury-mink-coats" style="font-size:.8125rem;margin-top:1rem;display:inline-block;">Continue shopping</a>
+            </div>
+          </aside>
+
+        </div>
+      </div>
+
+      <div id="checkout-done" hidden>
+        <div class="text-center" style="max-width:620px;margin-inline:auto;padding-block:3rem;">
+          <div style="width:56px;height:56px;margin:0 auto 1.5rem;border-radius:50%;background:var(--c-accent);color:var(--c-accent-contrasting);display:grid;place-items:center;">
+            <svg viewBox="0 0 24 24" fill="none" style="width:28px;height:28px"><path d="m4 12.5 5 5 11-11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h1 class="serif" style="font-size:var(--fs-display-3);">Almost done.</h1>
+          <p style="margin-top:1rem;color:var(--c-text-60);" data-done-text></p>
+          <p style="margin-top:1.5rem;color:var(--c-text-80);">
+            Send us the message that just opened and we will confirm your pieces, sizes and
+            payment link there. Your piece then goes to the cutting table in Greece &mdash;
+            10 to 14 days &mdash; and you will get a tracking link the moment it leaves us.
+          </p>
+          <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-top:2.25rem;">
+            <a class="btn btn-secondary" href="https://wa.me/447386156525" target="_blank" rel="noopener">Reopen the WhatsApp chat</a>
+            <a class="btn btn-primary" href="../index.html">Back to the shop</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<div data-mm-footer></div>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/app.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var linesSlot = document.querySelector("[data-checkout-lines]");
+
+  function items() {
+    try { return JSON.parse(localStorage.getItem("mm_cart") || "[]"); } catch (e) { return []; }
+  }
+
+  function subtotal(list) {
+    return list.reduce(function (n, i) { return n + i.price * i.qty; }, 0);
+  }
+
+  function shipCost(list) {
+    if (!list.length) return 0;
+    var sub = subtotal(list);
+    if (sub >= 1000) return 0;
+    return list[0].country === "UK" ? 12 : 35;
+  }
+
+  function render() {
+    var list = items();
+
+    if (!list.length) {
+      document.getElementById("checkout-live").innerHTML =
+        '<div class="text-center" style="max-width:520px;margin-inline:auto;padding-block:3rem;">' +
+        '<h1 class="serif" style="font-size:var(--fs-display-3);">Your bag is empty</h1>' +
+        '<p style="margin-top:1rem;color:var(--c-text-60);">Add a piece before checking out.</p>' +
+        '<a class="btn btn-primary" href="../collection.html?c=luxury-mink-coats" style="margin-top:2rem;">Browse the collection</a></div>';
+      return;
+    }
+
+    linesSlot.innerHTML = list.map(function (i) {
+      return '<div class="line-item">' +
+        '<div class="line-item__media" data-img-slot="' + esc2(i.image) + '" data-img-alt="' + esc2(i.title) + '"></div>' +
+        '<div><div class="line-item__title">' + esc2(i.title) + '</div>' +
+        (i.color || i.size ? '<div class="line-item__variant">' + esc2([i.color, i.size].filter(Boolean).join(" / ")) + '</div>' : '') +
+        '<div class="line-item__row"><span style="font-size:.8125rem;color:var(--c-text-60);">Qty ' + i.qty + '</span>' +
+        '<span class="line-item__price">' + MM.money(i.price * i.qty) + '</span></div></div></div>';
+    }).join("");
+
+    Array.prototype.forEach.call(document.querySelectorAll("[data-img-slot]"), function (slot) {
+      slot.appendChild(MM.productImg(slot.dataset.imgSlot, slot.dataset.imgAlt, { label: slot.dataset.imgAlt }));
+    });
+
+    var sub = subtotal(list);
+    var ship = shipCost(list);
+    document.querySelector("[data-co-sub]").textContent = MM.money(sub);
+    document.querySelector("[data-co-ship]").textContent = ship === 0 ? "Free" : MM.money(ship);
+    document.querySelector("[data-co-total]").textContent = MM.money(sub + ship);
+
+    Array.prototype.forEach.call(document.querySelectorAll("[data-split]"), function (opt) {
+      opt.textContent = "Pay in 6 interest-free instalments — " + MM.money(Math.ceil(sub / 6)) + " a month";
+    });
+  }
+
+  function esc2(s) {
+    return String(s).replace(/[&<>"']/g, function (m) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m];
+    });
+  }
+
+  document.addEventListener("submit", function (e) {
+    var form = e.target;
+    if (!form.hasAttribute("data-form")) return;
+    e.preventDefault();
+
+    var required = Array.prototype.slice.call(form.querySelectorAll("[required]"));
+    var valid = true;
+    required.forEach(function (f) {
+      var bad = f.type === "email" ? !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.value.trim()) : !f.value.trim();
+      f.style.borderColor = bad ? "#d02f2e" : "";
+      if (bad) valid = false;
+    });
+
+    var err = form.querySelector("[data-form-err]");
+    if (err) err.hidden = valid;
+    if (!valid) return;
+
+    /* Piege a robots : invisible pour une vraie cliente, rempli par les bots. */
+    if (document.getElementById("c-website").value) return;
+
+    var list = items();
+    if (!list.length) return;
+
+    var el = function (id) { return document.getElementById(id); };
+    var email = el("c-email").value.trim();
+    var first = el("c-first").value.trim();
+    var last = el("c-last").value.trim();
+    var ref = "MM-" + Date.now().toString(36).toUpperCase().slice(-6);
+    var total = subtotal(list) + shipCost(list);
+    var plan = el("c-plan").value;
+
+    var lines = list.map(function (i, n) {
+      return (n + 1) + ". " + i.title +
+        (i.size ? " — size " + i.size : "") +
+        (i.color ? " — " + i.color : "") +
+        " × " + i.qty + " — " + MM.money(i.price * i.qty);
+    });
+
+    /* La commande est enregistree pour que tu la voies dans l'admin,
+       mais aucune donnee bancaire n'existe sur ce site, donc rien a filtrer. */
+    var payload = {
+      type: "order",
+      ref: ref,
+      email: email,
+      name: first + (last ? " " + last : ""),
+      phone: el("c-phone").value.trim(),
+      address: [el("c-addr").value.trim(), el("c-city").value.trim(),
+                el("c-post").value.trim(), el("c-country").value].filter(Boolean).join(", "),
+      note: el("c-notes").value.trim(),
+      plan: plan,
+      page: location.pathname + location.search,
+      items: list.map(function (i) {
+        return { title: i.title, slug: i.slug, size: i.size || "", qty: i.qty || 1 };
+      })
+    };
+
+    var btn = el("checkout-submit");
+    btn.disabled = true;
+    btn.textContent = "Opening WhatsApp…";
+
+    MM.sendLead(payload).catch(function () { /* on ne bloque pas la cliente */ }).then(function () {
+      /* La commande se valide dans la discussion : c'est la que tu
+         confirmes les tailles, le total et le mode de paiement. */
+      var wa =
+        "Hello Marie Minks, I would like to order:\n\n" + lines.join("\n") +
+        "\n\nTotal: " + MM.money(total) +
+        "\nPayment method: " + plan +
+        "\n\nName: " + payload.name +
+        "\nEmail: " + email +
+        "\nPhone: " + payload.phone +
+        "\nDelivery address: " + payload.address +
+        (payload.note ? "\nNotes: " + payload.note : "") +
+        "\n\nOrder reference: " + ref;
+
+      window.open("https://wa.me/447386156525?text=" + encodeURIComponent(wa), "_blank", "noopener");
+
+      document.getElementById("checkout-live").hidden = true;
+      document.getElementById("checkout-done").hidden = false;
+      document.querySelector("[data-done-text]").textContent =
+        "Reference " + ref + " — " + list.length + " piece" + (list.length > 1 ? "s" : "") +
+        ", " + MM.money(total) + ". We are confirming the details with you now.";
+
+      localStorage.setItem("mm_cart", "[]");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }, true);
+
+  render();
+});
+</script>
+</body>
+</html>

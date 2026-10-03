@@ -1,0 +1,18 @@
+# --- Dependances (aucune, mais au cas ou) ---
+node_modules/
+npm-debug.log*
+
+# --- Donnees du site : ne jamais versionner ---
+data/
+!data/.gitkeep
+
+# --- Photos : trop lourdes pour git ---
+images/*
+!images/README.txt
+
+# --- Fichiers temporaires ---
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+.env

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 56" role="img" aria-label="Marie Minks">
+  <g fill="none" stroke="#15110d" stroke-width="1.15" stroke-linejoin="round">
+    <path d="M110 4 L124 10 L124 26 C124 36 118 43 110 47 C102 43 96 36 96 26 L96 10 Z" opacity=".9"/>
+    <path d="M110 12 L110 38 M104 19 L110 24 L116 19 M104 27 L110 32 L116 27" stroke-linecap="round" opacity=".55"/>
+  </g>
+  <text x="110" y="54" text-anchor="middle"
+        font-family="'Bodoni Moda', 'Times New Roman', serif"
+        font-size="15" letter-spacing="4.2" fill="#15110d">MARIE MINKS</text>
+</svg>

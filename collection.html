@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Collection &ndash; Marie Minks</title>
+<meta name="description" content="Browse the Marie Minks collection: luxury mink coats, pattern mink pieces, kids coats and fur accessories.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=Jost:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body data-page="collection">
+
+<div data-mm-header></div>
+<div data-mm-search></div>
+<div data-mm-cart></div>
+
+<main id="main">
+  <div class="container">
+    <nav class="banner" aria-label="Breadcrumb" style="padding-bottom:0">
+      <ol class="breadcrumbs">
+        <li><a href="index.html">Home</a></li>
+        <li data-page-crumb>Shop all</li>
+      </ol>
+    </nav>
+
+    <div class="page-head">
+      <h1 class="page-head__title" data-page-title>Shop all</h1>
+      <p class="page-head__text" data-page-text></p>
+    </div>
+
+    <!-- Navigation rapide par categorie : evite de fouiller les filtres -->
+    <nav class="cat-nav" data-cat-nav aria-label="Browse by category"></nav>
+  </div>
+
+  <div class="collection-bar">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+      <div class="collection-bar__group">
+        <span class="collection-bar__count"><span data-result-count>0</span> pieces</span>
+        <button class="filter-trigger" type="button" data-filter-toggle aria-expanded="false" aria-controls="filterPanel">Filters</button>
+      </div>
+      <div class="collection-bar__group">
+        <label class="collection-bar__select" for="sort" style="margin-right:.35rem;">Sort by</label>
+        <select class="collection-bar__select" id="sort" data-sort>
+          <option value="featured">Featured</option>
+          <option value="price-asc">Price: low to high</option>
+          <option value="price-desc">Price: high to low</option>
+          <option value="rating">Best rated</option>
+          <option value="title">Alphabetical</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="active-filters" data-active-filters></div>
+  </div>
+
+  <section class="section section--tight">
+    <div class="container">
+      <div class="collection-layout">
+
+        <aside class="filter-panel" id="filterPanel" aria-label="Filters">
+          <div data-filters></div>
+          <div style="margin-top:1.5rem;padding:1.1rem;background:var(--c-bg-meta);">
+            <p style="font-size:.8125rem;font-weight:500;">Need help choosing?</p>
+            <p style="font-size:.8125rem;color:var(--c-text-60);margin-top:.35rem;">
+              Message us and we will tell you honestly what we would buy.
+            </p>
+            <a class="btn btn-tertiary" href="https://wa.me/447386156525" target="_blank" rel="noopener" style="margin-top:.85rem;">WhatsApp us</a>
+          </div>
+        </aside>
+
+        <div>
+          <div class="grid-products" data-product-grid></div>
+
+          <div class="text-center" data-no-results hidden style="padding-block:3rem;">
+            <h2 style="font-family:var(--f-serif);">Nothing matches those filters</h2>
+            <p style="margin-top:.75rem;color:var(--c-text-60);">
+              Try removing a filter, or message us — if it exists, we can usually source it.
+            </p>
+            <button class="btn btn-secondary" type="button" data-unset-all style="margin-top:1.75rem;">Clear all filters</button>
+          </div>
+
+          <div class="load-more">
+            <button class="btn btn-secondary" type="button" data-load-more>Load more</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<div data-mm-footer></div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

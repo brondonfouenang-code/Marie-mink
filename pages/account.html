@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Order &ndash; Marie Minks</title>
+<meta name="description" content="Check on a Marie Minks order, or ask us to hold a piece while you decide.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=Jost:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+
+<body data-page="account">
+
+<div data-mm-header></div>
+<div data-mm-search></div>
+<div data-mm-cart></div>
+
+<main id="main">
+  <div class="container">
+    <nav class="banner" aria-label="Breadcrumb" style="padding-bottom:0">
+      <ol class="breadcrumbs">
+        <li><a href="../index.html">Home</a></li>
+        <li>Your order</li>
+      </ol>
+    </nav>
+    <div class="page-head">
+      <p class="eyebrow">No account needed</p>
+      <h1 class="page-head__title">Your order</h1>
+      <p class="page-head__text">
+        You order as a guest. We keep your order details, and you keep the reference we give you.
+        Anything you need, message us directly.
+      </p>
+    </div>
+  </div>
+
+  <section class="section section--tight">
+    <div class="container container-narrow">
+
+      <div class="promo" style="background:var(--c-bg-meta);margin-bottom:2rem;">
+        <div>
+          <h2 class="promo__title" style="font-size:var(--fs-h3);font-family:var(--f-sans);font-weight:500;">Following an order</h2>
+          <p class="promo__text" style="color:var(--c-text-80);">
+            Have the reference from your order message &mdash; it looks like <strong>MM-XXXXXX</strong>.
+            Send it to us on WhatsApp and we will tell you exactly where your piece is, from the
+            cutting table in Greece to the delivery door.
+          </p>
+          <a class="btn btn-primary" href="https://wa.me/447386156525?text=Hello%20Marie%20Minks%2C%20I%20would%20like%20to%20check%20on%20my%20order%20%28reference%3A%20MM-______%29"
+             target="_blank" rel="noopener" style="margin-top:1.25rem;">Message us on WhatsApp</a>
+        </div>
+      </div>
+
+      <h2 style="font-size:var(--fs-h3);margin-bottom:.6rem;">Pieces you saved</h2>
+      <p style="color:var(--c-text-60);font-size:var(--fs-body-s);margin-bottom:1.5rem;">
+        Kept in this browser only. No account, nothing sent to us.
+      </p>
+      <div class="grid-products grid-products--4" data-wishlist></div>
+      <p class="form-note" id="wishlist-empty" hidden style="margin-top:1.5rem;">
+        Nothing saved yet. Tap the heart on any piece to keep it here.
+      </p>
+
+      <div style="margin-top:3rem;padding-top:2rem;border-top:1px solid var(--c-border-meta);">
+        <h2 style="font-size:var(--fs-h3);margin-bottom:.75rem;">Other ways to reach us</h2>
+        <ul style="list-style:none;padding:0;display:grid;gap:.75rem;color:var(--c-text-80);">
+          <li><a class="link-underline" href="https://wa.me/447386156525" target="_blank" rel="noopener">WhatsApp</a> &mdash; fastest, usually answered within the hour</li>
+          <li><a class="link-underline" href="mailto:hello@marieminks.co.uk">Email</a> &mdash; hello@marieminks.co.uk</li>
+          <li><a class="link-underline" href="contact.html">Contact form</a> &mdash; we reply the same day</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<div data-mm-footer></div>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/app.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var slugs = JSON.parse(localStorage.getItem("mm_wish") || "[]");
+  var list = PRODUCTS.filter(function (p) { return slugs.indexOf(p.slug) > -1; });
+
+  var grid = document.querySelector("[data-wishlist]");
+  grid.innerHTML = "";
+  list.forEach(function (p) { grid.appendChild(MM.productCard(p)); });
+
+  document.getElementById("wishlist-empty").hidden = list.length > 0;
+
+  /* On supprime aussi un ancien "mm_account" : les mockups precedents
+     stockaient un mot de passe en clair dans le navigateur. */
+  localStorage.removeItem("mm_account");
+});
+</script>
+</body>
+</html>

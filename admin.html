@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin — Marie Minks</title>
+<link rel="icon" href="assets/img/logo.svg">
+<link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body>
+
+<!-- ===================================================================== -->
+<!-- PORTE DE CONNEXION                                                     -->
+<!-- ===================================================================== -->
+<div class="gate" id="gate" hidden>
+  <form class="gate__box" id="loginForm" autocomplete="on">
+    <h1>Administration</h1>
+    <p>Marie Minks — espace prive</p>
+
+    <label for="pw">Mot de passe</label>
+    <input type="password" id="pw" name="password" autocomplete="current-password" required autofocus>
+
+    <button class="btn btn--primary btn--full" type="submit" id="loginBtn">Se connecter</button>
+    <div class="gate__err" id="loginErr" hidden></div>
+  </form>
+</div>
+
+
+<!-- ===================================================================== -->
+<!-- APPLICATION                                                            -->
+<!-- ===================================================================== -->
+<div class="app" id="app" hidden>
+
+  <div class="scrim" id="scrim"></div>
+
+  <!-- ---------------------------------------------------------- Menu -->
+  <aside class="side" id="side">
+    <div class="side__brand">
+      <img src="assets/img/logo.svg" alt="Marie Minks">
+      <b>Back-office<span>Marie Minks</span></b>
+    </div>
+
+    <div class="side__group">
+      <div class="side__label">Vue d'ensemble</div>
+      <button class="side__link" data-nav="dashboard">
+        <span>Tableau de bord</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+      </button>
+      <button class="side__link" data-nav="performance">
+        <span>Performance</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l5-6 4 4 6-8"/><path d="M21 7v6h-6"/></svg>
+      </button>
+    </div>
+
+    <div class="side__group">
+      <div class="side__label">Contenu</div>
+      <button class="side__link" data-nav="photos">
+        <span>Photos</span>
+        <span class="pill" id="photoCount" hidden>0</span>
+      </button>
+      <button class="side__link" data-nav="products">
+        <span>Produits</span>
+        <span class="pill" id="prodCount">0</span>
+      </button>
+      <button class="side__link" data-nav="seo">
+        <span>SEO</span>
+        <span class="pill" id="seoScore" hidden>0</span>
+      </button>
+    </div>
+
+    <div class="side__group">
+      <div class="side__label">Donnees recues</div>
+      <button class="side__link" data-nav="orders">
+        <span>Commandes</span>
+        <span class="pill" id="orderCount" hidden>0</span>
+      </button>
+      <button class="side__link" data-nav="messages">
+        <span>Messages</span>
+        <span class="pill" id="msgCount" hidden>0</span>
+      </button>
+      <button class="side__link" data-nav="subscribers">
+        <span>Newsletter</span>
+        <span class="pill" id="subCount" hidden>0</span>
+      </button>
+      <button class="side__link" data-nav="log">
+        <span>Journal</span>
+      </button>
+    </div>
+
+    <div class="side__group">
+      <div class="side__label">Compte</div>
+      <button class="side__link" data-nav="security">
+        <span>Securite</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+      </button>
+    </div>
+
+    <div class="side__foot">
+      <a class="side__site" href="/" target="_blank" rel="noopener">Voir le site</a>
+      <button class="btn btn--full" id="logoutBtn">Deconnexion</button>
+    </div>
+  </aside>
+
+  <!-- ------------------------------------------------------- Contenu -->
+  <div class="main">
+
+    <header class="top">
+      <div>
+        <button class="btn btn--sm menu-toggle" id="menuBtn" aria-label="Menu">☰</button>
+        <h1 id="viewTitle">Tableau de bord</h1>
+        <p id="viewSub">Vue d'ensemble de l'activite</p>
+      </div>
+      <div class="top__actions">
+        <button class="btn btn--sm" id="refreshBtn" title="Recharger les donnees">Actualiser</button>
+      </div>
+    </header>
+
+    <!-- ================================================== DASHBOARD -->
+    <section class="view is-active" data-view="dashboard">
+      <div class="cards">
+        <div class="stat stat--accent">
+          <div class="stat__label">Commandes</div>
+          <div class="stat__value" id="kpiOrders">—</div>
+          <div class="stat__sub" id="kpiRevenue">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat__label">Messages</div>
+          <div class="stat__value" id="kpiMessages">—</div>
+          <div class="stat__sub">non lus : <span id="kpiUnread">0</span></div>
+        </div>
+        <div class="stat">
+          <div class="stat__label">Abonnes newsletter</div>
+          <div class="stat__value" id="kpiSubs">—</div>
+          <div class="stat__sub" id="kpiNewSubs">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat__label">Visites uniques (30 j)</div>
+          <div class="stat__value" id="kpiViews">—</div>
+          <div class="stat__sub" id="kpiSessions">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat__label">Photos manquantes</div>
+          <div class="stat__value" id="kpiMissing">—</div>
+          <div class="stat__sub" id="kpiMissingSub">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat__label">Score SEO</div>
+          <div class="stat__value" id="kpiSeo">—</div>
+          <div class="stat__sub" id="kpiSeoSub">—</div>
+        </div>
+      </div>
+
+      <div class="cols">
+        <div class="panel">
+          <div class="panel__head"><h2>Dernieres commandes</h2></div>
+          <div class="panel__body panel__body--flush" id="dashOrders"><div class="empty">—</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel__head"><h2>Derniers messages</h2></div>
+          <div class="panel__body panel__body--flush" id="dashMsgs"><div class="empty">—</div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head">
+          <div><h2>A faire</h2><p>Actions recommandees pour completer le site</p></div>
+        </div>
+        <div class="panel__body" id="todoList"></div>
+      </div>
+    </section>
+
+    <!-- ================================================= PERFORMANCE -->
+    <section class="view" data-view="performance">
+      <div class="cards">
+        <div class="stat"><div class="stat__label">Pages vues</div><div class="stat__value" id="pTotal">—</div><div class="stat__sub">periode choisie</div></div>
+        <div class="stat"><div class="stat__label">Sessions</div><div class="stat__value" id="pSessions">—</div><div class="stat__sub">visiteurs distincts</div></div>
+        <div class="stat"><div class="stat__label">Pages / session</div><div class="stat__value" id="pDepth">—</div><div class="stat__sub">profondeur moyenne</div></div>
+        <div class="stat"><div class="stat__label">Evenements</div><div class="stat__value" id="pEvents">—</div><div class="stat__sub">ajouts panier, clics…</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head">
+          <div><h2>Trafic par jour</h2><p>Pages vues exclues des assets</p></div>
+          <div class="filters" style="margin:0" id="rangeFilter">
+            <button class="filter-chip" data-days="7">7 j</button>
+            <button class="filter-chip is-active" data-days="30">30 j</button>
+            <button class="filter-chip" data-days="90">90 j</button>
+            <button class="filter-chip" data-days="365">1 an</button>
+          </div>
+        </div>
+        <div class="panel__body">
+          <div class="chart" id="chart"></div>
+          <div class="axis"><span id="chartFrom"></span><span id="chartTo"></span></div>
+        </div>
+      </div>
+
+      <div class="cols">
+        <div class="panel">
+          <div class="panel__head"><h2>Pages les plus vues</h2></div>
+          <div class="panel__body" id="topPages"><div class="empty">—</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel__head"><h2>Provenances</h2></div>
+          <div class="panel__body" id="referrers"><div class="empty">—</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel__head"><h2>Appareils</h2></div>
+          <div class="panel__body" id="devices"><div class="empty">—</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel__head"><h2>Pays (langue)</h2></div>
+          <div class="panel__body" id="countries"><div class="empty">—</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel__head"><h2>Evenements</h2></div>
+          <div class="panel__body" id="events"><div class="empty">—</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================== PHOTOS -->
+    <section class="view" data-view="photos">
+      <div class="panel">
+        <div class="panel__head">
+          <div>
+            <h2>Ajouter des photos</h2>
+            <p>Glisse tes fichiers ici, ou clique pour choisir. JPG, WEBP, PNG, AVIF, GIF — 12 Mo max.</p>
+          </div>
+        </div>
+        <div class="panel__body">
+          <div class="drop" id="drop" tabindex="0" role="button">
+            <b>Deposer les photos ici</b>
+            <span>ou clique pour parcourir tes fichiers</span>
+          </div>
+          <input type="file" id="fileInput" multiple accept="image/*" hidden>
+          <div id="uploadList" style="margin-top:1rem"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head">
+          <div><h2>Photos attendues</h2><p>Le site attend ces noms de fichiers. Clique sur « Envoyer » pour envoyer le bon fichier vers le bon emplacement.</p></div>
+          <div class="filters" style="margin:0" id="photoFilter">
+            <button class="filter-chip is-active" data-kind="all">Toutes</button>
+            <button class="filter-chip" data-kind="produit">Produits</button>
+            <button class="filter-chip" data-kind="collection">Collections</button>
+            <button class="filter-chip" data-kind="page">Pages</button>
+            <button class="filter-chip" data-kind="orphan">En trop</button>
+          </div>
+        </div>
+        <div class="panel__body"><div class="photos" id="photoGrid"></div></div>
+      </div>
+    </section>
+
+    <!-- ==================================================== PRODUITS -->
+    <section class="view" data-view="products">
+      <div class="panel">
+        <div class="panel__head">
+          <div><h2>Catalogue</h2><p>Modifie les fiches, puis enregistre. <code>data/products.json</code> et <code>assets/js/data.js</code> sont mis a jour automatiquement.</p></div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+            <button class="btn btn--sm" id="addProdBtn">+ Ajouter</button>
+            <button class="btn btn--sm" id="exportProdBtn">Exporter</button>
+            <button class="btn btn--primary btn--sm" id="saveProdBtn">Enregistrer</button>
+          </div>
+        </div>
+        <div class="panel__body">
+          <input id="prodSearch" class="field" placeholder="Rechercher un titre ou un slug…" style="margin-bottom:1rem">
+        </div>
+        <div class="panel__body panel__body--flush" id="prodList"></div>
+      </div>
+
+      <!-- Editeur -->
+      <div class="panel" id="editor" hidden>
+        <div class="panel__head">
+          <div><h2 id="edTitle">Fiche produit</h2><p>Les champs non remplis seront ignores.</p></div>
+          <button class="btn btn--sm" id="closeEditor">Fermer</button>
+        </div>
+        <div class="panel__body">
+          <div class="row">
+            <div class="field">
+              <label>Titre *</label>
+              <input id="ed_title">
+            </div>
+            <div class="field">
+              <label>Slug * (URL)</label>
+              <input id="ed_slug">
+            </div>
+          </div>
+          <div class="row-3">
+            <div class="field"><label>Prix</label><input id="ed_price" type="number" min="0" step="1"></div>
+            <div class="field"><label>Prix barré</label><input id="ed_compareAt" type="number" min="0"></div>
+            <div class="field"><label>Stock</label>
+              <select id="ed_stock"><option value="in">En stock</option><option value="low">Stock faible</option><option value="out">Rupture</option></select>
+            </div>
+          </div>
+          <div class="row-3">
+            <div class="field"><label>Badge</label>
+              <select id="ed_badge"><option value="">—</option><option value="new">Nouveau</option><option value="bestseller">Best-seller</option><option value="ships-fast">Livraison rapide</option><option value="final">Derniere piece</option></select>
+            </div>
+            <div class="field"><label>Note</label><input id="ed_rating" type="number" min="0" max="5" step="0.1"></div>
+            <div class="field"><label>Avis</label><input id="ed_reviews" type="number" min="0"></div>
+          </div>
+          <div class="field">
+            <label>Meta description <span class="field__count" id="ed_shortCount">0 / 165</span></label>
+            <textarea id="ed_short" maxlength="200"></textarea>
+            <div class="field__hint">70 a 165 caracteres : c'est ce que Google affiche.</div>
+          </div>
+          <div class="field">
+            <label>Description complete</label>
+            <textarea id="ed_description" rows="6"></textarea>
+          </div>
+          <div class="field">
+            <label>Collections (slug, une par ligne)</label>
+            <textarea id="ed_collections" rows="2"></textarea>
+          </div>
+          <div class="field">
+            <label>Images (nom de fichier sans extension, une par ligne)</label>
+            <textarea id="ed_images" rows="3"></textarea>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>Tailles (une par ligne)</label>
+              <textarea id="ed_sizes" rows="4"></textarea>
+            </div>
+            <div class="field">
+              <label>Points forts (un par ligne)</label>
+              <textarea id="ed_features" rows="4"></textarea>
+            </div>
+          </div>
+          <div class="field">
+            <label>Specifications (cle: valeur, une par ligne)</label>
+            <textarea id="ed_specs" rows="4"></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= SEO -->
+    <section class="view" data-view="seo">
+      <div class="panel">
+        <div class="panel__head">
+          <div><h2>Audit SEO</h2><p>Verifie les titres, descriptions et photos de chaque fiche.</p></div>
+          <button class="btn btn--sm" id="auditBtn">Relancer l'audit</button>
+        </div>
+        <div class="panel__body">
+          <div class="score">
+            <div class="score__ring" id="seoRing">—</div>
+            <div class="score__text">
+              <b id="seoHeadline">Analyse en cours…</b>
+              <span id="seoDetail"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head">
+          <div><h2>Points a corriger</h2><p>Classes par gravite.</p></div>
+          <div class="filters" style="margin:0" id="seoFilter">
+            <button class="filter-chip is-active" data-level="all">Tous</button>
+            <button class="filter-chip" data-level="error">Erreurs</button>
+            <button class="filter-chip" data-level="warn">Avertissements</button>
+            <button class="filter-chip" data-level="info">Infos</button>
+          </div>
+        </div>
+        <div class="panel__body panel__body--flush" id="seoIssues"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head">
+          <div><h2>Titres et descriptions personnalises</h2><p>Overrives SEO. Ils ne modifient pas le site visible, seulement les balises envoyees aux moteurs de recherche.</p></div>
+        </div>
+        <div class="panel__body panel__body--flush" id="seoOverrides"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head"><h2>Fichiers pour Google</h2></div>
+        <div class="panel__body">
+          <p style="color:var(--muted);font-size:.8125rem;margin-bottom:.75rem">Ces deux URL sont generees automatiquement par le serveur. Verifie-les apres chaque modification importante.</p>
+          <a class="btn btn--sm" href="/sitemap.xml" target="_blank" rel="noopener">/sitemap.xml</a>
+          <a class="btn btn--sm" href="/robots.txt" target="_blank" rel="noopener">/robots.txt</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================== COMMANDES -->
+    <section class="view" data-view="orders">
+      <div class="panel">
+        <div class="panel__head">
+          <div><h2>Commandes recues</h2><p>Enregistrees par le formulaire de commande.</p></div>
+          <button class="btn btn--sm" id="exportLeadBtn">Exporter</button>
+        </div>
+        <div class="panel__body panel__body--flush" id="ordersList"></div>
+      </div>
+    </section>
+
+    <!-- ==================================================== MESSAGES -->
+    <section class="view" data-view="messages">
+      <div class="panel">
+        <div class="panel__head">
+          <div><h2>Messages</h2><p>Formulaire de contact et demandes de conseil.</p></div>
+          <button class="btn btn--sm" id="exportMsgBtn">Exporter</button>
+        </div>
+        <div class="panel__body panel__body--flush" id="messagesList"></div>
+      </div>
+    </section>
+
+    <!-- ================================================== NEWSLETTER -->
+    <section class="view" data-view="subscribers">
+      <div class="panel">
+        <div class="panel__head">
+          <div><h2>Abonnes newsletter</h2><p>Inscriptions via le pied de page du site.</p></div>
+          <button class="btn btn--sm" id="exportSubBtn">Exporter</button>
+        </div>
+        <div class="panel__body panel__body--flush" id="subsList"></div>
+      </div>
+    </section>
+
+    <!-- ====================================================== JOURNAL -->
+    <section class="view" data-view="log">
+      <div class="panel">
+        <div class="panel__head">
+          <div><h2>Journal d'activite</h2><p>400 dernieres entrees : visites, connexions, actions admin.</p></div>
+        </div>
+        <div class="panel__body panel__body--flush">
+          <div class="log" id="logList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================== SECURITE -->
+    <section class="view" data-view="security">
+      <div class="panel">
+        <div class="panel__head">
+          <div>
+            <h2>Changer le mot de passe</h2>
+            <p>Ta session reste ouverte. Les autres sessions (autre navigateur, autre appareil) sont immediatement invalidees.</p>
+          </div>
+        </div>
+        <div class="panel__body">
+          <div class="field" style="max-width:420px">
+            <label>Mot de passe actuel *</label>
+            <input type="password" id="pw_current" autocomplete="current-password">
+          </div>
+          <div class="field" style="max-width:420px">
+            <label>Nouveau mot de passe * <span class="dim" id="pwLen">0 caractere</span></label>
+            <input type="password" id="pw_next" autocomplete="new-password">
+            <div class="field__hint">8 caracteres minimum. Utilise une phrase, c'est plus sur et plus facile a retenir.</div>
+          </div>
+          <div class="field" style="max-width:420px">
+            <label>Confirmer le nouveau mot de passe *</label>
+            <input type="password" id="pw_confirm" autocomplete="new-password">
+          </div>
+          <button class="btn btn--primary" id="pwSubmit">Mettre a jour</button>
+          <div id="pwMsg" style="margin-top:.85rem;font-size:.8125rem"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head"><h2>Oubli du mot de passe ?</h2></div>
+        <div class="panel__body">
+          <p style="color:var(--muted);font-size:.8125rem;margin-bottom:.75rem">
+            Arrete le serveur, puis relance cette commande dans le dossier du site. Elle affiche un nouveau
+            mot de passe et invalide l'ancien. Aucun fichier a supprimer.
+          </p>
+          <code class="mono" style="display:block;padding:.7rem .9rem;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);margin-bottom:.75rem">node server.js --reset-password</code>
+          <p style="color:var(--muted);font-size:.8125rem">
+            Tu peux aussi le definir au demarrage : <code class="mono">$env:ADMIN_PASSWORD="ton-mdp"; node server.js</code>
+            (PowerShell). Cette methode est pratique pour un essai.
+          </p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head"><h2>Recommandations</h2></div>
+        <div class="panel__body">
+          <div class="bars">
+            <div class="bar-row"><div class="bar-row__label">Utilise un mot de passe unique</div><div></div><div class="bar-row__n">Fort</div></div>
+            <div class="bar-row"><div class="bar-row__label">Ne le reutilise nulle part ailleurs</div><div></div><div class="bar-row__n">Fort</div></div>
+            <div class="bar-row"><div class="bar-row__label">Serve le site en HTTPS</div><div></div><div class="bar-row__n">Fort</div></div>
+            <div class="bar-row"><div class="bar-row__label">Blocage automatique apres 8 echecs</div><div></div><div class="bar-row__n">Actif</div></div>
+            <div class="bar-row"><div class="bar-row__label">Sauvegarde le dossier data/</div><div></div><div class="bar-row__n">Fort</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="assets/js/admin.js"></script>
+</body>
+</html>
