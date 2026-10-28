@@ -10,5 +10,17 @@
   "scripts": {
     "start": "node server.js",
     "reset-password": "node server.js --reset-password"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brondonfouenang-code/Marie-mink.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/brondonfouenang-code/Marie-mink/issues"
+  },
+  "homepage": "https://github.com/brondonfouenang-code/Marie-mink#readme"
 }
