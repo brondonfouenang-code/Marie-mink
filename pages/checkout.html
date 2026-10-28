@@ -267,7 +267,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var email = el("c-email").value.trim();
     var first = el("c-first").value.trim();
     var last = el("c-last").value.trim();
-    var ref = "MM-" + Date.now().toString(36).toUpperCase().slice(-6);
+    var ref = "KF-" + Date.now().toString(36).toUpperCase().slice(-6);
     var total = subtotal(list) + shipCost(list);
     var plan = el("c-plan").value;
 

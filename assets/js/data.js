@@ -267,7 +267,7 @@ const PRODUCTS =
     ]
   },
   {
-    "slug": "marie-minks-kids-teddy-bears",
+    "slug": "kingc-furs-kids-teddy-bears",
     "title": "Marie Minks Kids Teddy Bears",
     "vendor": "Marie Minks",
     "price": 300,
@@ -281,11 +281,11 @@ const PRODUCTS =
     "rating": null,
     "reviews": null,
     "images": [
-      "marie-minks-kids-teddy-bears-1",
-      "marie-minks-kids-teddy-bears-2",
-      "marie-minks-kids-teddy-bears-3",
-      "marie-minks-kids-teddy-bears-4",
-      "marie-minks-kids-teddy-bears-5"
+      "kingc-furs-kids-teddy-bears-1",
+      "kingc-furs-kids-teddy-bears-2",
+      "kingc-furs-kids-teddy-bears-3",
+      "kingc-furs-kids-teddy-bears-4",
+      "kingc-furs-kids-teddy-bears-5"
     ],
     "colors": [
       {
@@ -531,8 +531,8 @@ const PRODUCTS =
     ]
   },
   {
-    "slug": "mm-signature-luxe-puffer-coat",
-    "title": "MM Signature Luxe Puffer Coat",
+    "slug": "kingc-signature-luxe-puffer-coat",
+    "title": "Kingc Signature Luxe Puffer Coat",
     "vendor": "Marie Minks",
     "price": 350,
     "compareAt": null,
@@ -544,20 +544,20 @@ const PRODUCTS =
     "rating": null,
     "reviews": null,
     "images": [
-      "mm-signature-luxe-puffer-coat-1",
-      "mm-signature-luxe-puffer-coat-2",
-      "mm-signature-luxe-puffer-coat-3",
-      "mm-signature-luxe-puffer-coat-4",
-      "mm-signature-luxe-puffer-coat-5",
-      "mm-signature-luxe-puffer-coat-6",
-      "mm-signature-luxe-puffer-coat-7",
-      "mm-signature-luxe-puffer-coat-8",
-      "mm-signature-luxe-puffer-coat-9",
-      "mm-signature-luxe-puffer-coat-10",
-      "mm-signature-luxe-puffer-coat-11",
-      "mm-signature-luxe-puffer-coat-12",
-      "mm-signature-luxe-puffer-coat-13",
-      "mm-signature-luxe-puffer-coat-14"
+      "kingc-signature-luxe-puffer-coat-1",
+      "kingc-signature-luxe-puffer-coat-2",
+      "kingc-signature-luxe-puffer-coat-3",
+      "kingc-signature-luxe-puffer-coat-4",
+      "kingc-signature-luxe-puffer-coat-5",
+      "kingc-signature-luxe-puffer-coat-6",
+      "kingc-signature-luxe-puffer-coat-7",
+      "kingc-signature-luxe-puffer-coat-8",
+      "kingc-signature-luxe-puffer-coat-9",
+      "kingc-signature-luxe-puffer-coat-10",
+      "kingc-signature-luxe-puffer-coat-11",
+      "kingc-signature-luxe-puffer-coat-12",
+      "kingc-signature-luxe-puffer-coat-13",
+      "kingc-signature-luxe-puffer-coat-14"
     ],
     "colors": [
       {
@@ -577,8 +577,8 @@ const PRODUCTS =
       "12",
       "14"
     ],
-    "short": "Elevate your winter wardrobe with the MM Signature Luxe Puffer Coat – where luxury meets everyday elegance.",
-    "description": "Elevate your winter wardrobe with the MM Signature Luxe Puffer Coat – where luxury meets everyday elegance.\nDesigned with a beautifully tailored silhouette, this statement piece features our signature waist-cinching belt, premium gold hardware, and an oversized detachable natural fur hood for the ultimate luxury finish. The flattering fitted shape creates a feminine look while still providing exceptional warmth and comfort.\nCrafted from high-quality materials and filled for superior insulation, this coat is designed to keep you warm through the coldest months without compromising on style.\n \nFeatures:\n • Oversized detachable natural fur hood\n • Signature MM gold buckle belt\n • Premium gold zip fastening and hardware\n • Flattering tailored fit\n • Side zip pockets\n • Lightweight yet exceptionally warm\n • Available in Black, White & Navy\n • Exclusive Marie Minks design\n \nStandard Sizes\n \nWhether you’re dressing for a day in the city or a winter event, the MM Signature Luxe Puffer Coat offers timeless elegance with a luxury finish",
+    "short": "Elevate your winter wardrobe with the Kingc Signature Luxe Puffer Coat – where luxury meets everyday elegance.",
+    "description": "Elevate your winter wardrobe with the Kingc Signature Luxe Puffer Coat – where luxury meets everyday elegance.\nDesigned with a beautifully tailored silhouette, this statement piece features our signature waist-cinching belt, premium gold hardware, and an oversized detachable natural fur hood for the ultimate luxury finish. The flattering fitted shape creates a feminine look while still providing exceptional warmth and comfort.\nCrafted from high-quality materials and filled for superior insulation, this coat is designed to keep you warm through the coldest months without compromising on style.\n \nFeatures:\n • Oversized detachable natural fur hood\n • Signature Kingc gold buckle belt\n • Premium gold zip fastening and hardware\n • Flattering tailored fit\n • Side zip pockets\n • Lightweight yet exceptionally warm\n • Available in Black, White & Navy\n • Exclusive Marie Minks design\n \nStandard Sizes\n \nWhether you’re dressing for a day in the city or a winter event, the Kingc Signature Luxe Puffer Coat offers timeless elegance with a luxury finish",
     "features": [],
     "specs": {},
     "badges": [
@@ -587,7 +587,7 @@ const PRODUCTS =
     ]
   },
   {
-    "slug": "the-original-marie-minks-peplum-bomber™-pattern-mink",
+    "slug": "the-original-kingc-furs-peplum-bomber™-pattern-mink",
     "title": "The Original Marie Minks Peplum Bomber™ Pattern Mink",
     "vendor": "Marie Minks",
     "price": 675,
@@ -600,31 +600,31 @@ const PRODUCTS =
     "rating": null,
     "reviews": null,
     "images": [
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-1",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-2",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-3",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-4",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-5",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-6",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-7",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-8",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-9",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-10",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-11",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-12",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-13",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-14",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-15",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-16",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-17",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-18",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-19",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-20",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-21",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-22",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-23",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-24",
-      "the-original-marie-minks-peplum-bomber™-pattern-mink-25"
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-1",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-2",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-3",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-4",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-5",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-6",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-7",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-8",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-9",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-10",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-11",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-12",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-13",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-14",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-15",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-16",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-17",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-18",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-19",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-20",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-21",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-22",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-23",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-24",
+      "the-original-kingc-furs-peplum-bomber™-pattern-mink-25"
     ],
     "colors": [
       {
@@ -675,7 +675,7 @@ const PRODUCTS =
     ]
   },
   {
-    "slug": "the-original-marie-minks-peplum-bomber™",
+    "slug": "the-original-kingc-furs-peplum-bomber™",
     "title": "The Original Marie Minks Peplum Bomber™",
     "vendor": "Marie Minks",
     "price": 895,
@@ -688,22 +688,22 @@ const PRODUCTS =
     "rating": null,
     "reviews": null,
     "images": [
-      "the-original-marie-minks-peplum-bomber™-1",
-      "the-original-marie-minks-peplum-bomber™-2",
-      "the-original-marie-minks-peplum-bomber™-3",
-      "the-original-marie-minks-peplum-bomber™-4",
-      "the-original-marie-minks-peplum-bomber™-5",
-      "the-original-marie-minks-peplum-bomber™-6",
-      "the-original-marie-minks-peplum-bomber™-7",
-      "the-original-marie-minks-peplum-bomber™-8",
-      "the-original-marie-minks-peplum-bomber™-9",
-      "the-original-marie-minks-peplum-bomber™-10",
-      "the-original-marie-minks-peplum-bomber™-11",
-      "the-original-marie-minks-peplum-bomber™-12",
-      "the-original-marie-minks-peplum-bomber™-13",
-      "the-original-marie-minks-peplum-bomber™-14",
-      "the-original-marie-minks-peplum-bomber™-15",
-      "the-original-marie-minks-peplum-bomber™-16"
+      "the-original-kingc-furs-peplum-bomber™-1",
+      "the-original-kingc-furs-peplum-bomber™-2",
+      "the-original-kingc-furs-peplum-bomber™-3",
+      "the-original-kingc-furs-peplum-bomber™-4",
+      "the-original-kingc-furs-peplum-bomber™-5",
+      "the-original-kingc-furs-peplum-bomber™-6",
+      "the-original-kingc-furs-peplum-bomber™-7",
+      "the-original-kingc-furs-peplum-bomber™-8",
+      "the-original-kingc-furs-peplum-bomber™-9",
+      "the-original-kingc-furs-peplum-bomber™-10",
+      "the-original-kingc-furs-peplum-bomber™-11",
+      "the-original-kingc-furs-peplum-bomber™-12",
+      "the-original-kingc-furs-peplum-bomber™-13",
+      "the-original-kingc-furs-peplum-bomber™-14",
+      "the-original-kingc-furs-peplum-bomber™-15",
+      "the-original-kingc-furs-peplum-bomber™-16"
     ],
     "colors": [
       {
@@ -785,7 +785,7 @@ const PRODUCTS =
       "6"
     ],
     "short": "Luxury in every detail ✨ Perfect For The Summer Our luxury fur sliders are now available in: 🖤 Black 🤍 White 🤎 Cream 🩷 Blush Pink The perfect finishing touch to your Marie Minks collection.",
-    "description": "Luxury in every detail ✨ Perfect For The Summer\nOur luxury fur sliders are now available in:\n🖤 Black\n🤍 White\n🤎 Cream\n🩷 Blush Pink\nThe perfect finishing touch to your Marie Minks collection.\nSoft • Elegant • Timeless\nwww.marieminks.co.uk",
+    "description": "Luxury in every detail ✨ Perfect For The Summer\nOur luxury fur sliders are now available in:\n🖤 Black\n🤍 White\n🤎 Cream\n🩷 Blush Pink\nThe perfect finishing touch to your Marie Minks collection.\nSoft • Elegant • Timeless\nwww.Marie Minks.co.uk",
     "features": [],
     "specs": {},
     "badges": []
@@ -839,7 +839,7 @@ const PRODUCTS =
       "16"
     ],
     "short": "Introducing The Monaco — a breathtaking full length luxury fox fur coat designed for women who were never meant to blend in.",
-    "description": "Introducing The Monaco — a breathtaking full length luxury fox fur coat designed for women who were never meant to blend in.\n \nCrafted with exceptional fullness and softness, this statement piece combines timeless elegance with modern glamour. Featuring a dramatic oversized collar, rich horizontal detailing, and a flawless full-length silhouette, The Monaco is designed to turn heads from every angle.\n \nMade for luxury lovers, winter events, designer fashion moments, and unforgettable entrances, this coat is more than outerwear — it’s an experience.\n \nWhether styled for evenings, luxury travel, special occasions, or elevated everyday wear, The Monaco brings effortless sophistication and undeniable presence.\n \n✨ Ultra full luxury fox fur\n ✨ Elegant full-length design\n ✨ Oversized statement collar\n ✨ Exceptional softness & craftsmanship\n ✨ Designed to stand out\n \nMarie Minks\n A Timeless Collection 🤍",
+    "description": "Introducing The Monaco — a breathtaking full length luxury fox fur coat designed for women who were never meant to blend in.\n \nCrafted with exceptional fullness and softness, this statement piece combines timeless elegance with modern glamour. Featuring a dramatic oversized collar, rich horizontal detailing, and a flawless full-length silhouette, The Monaco is designed to turn heads from every angle.\n \nMade for luxury lovers, winter events, designer fashion moments, and unforgettable entrances, this coat is more than outerwear — it’s an experience.\n \nWhether styled for evenings, luxury travel, special occasions, or elevated everyday wear, The Monaco brings effortless sophistication and undeniable presence.\n \n✨ Ultra full luxury fox fur\n ✨ Elegant full-length design\n ✨ Oversized statement collar\n ✨ Exceptional softness & craftsmanship\n ✨ Designed to stand out\n \nKingc Furs\n A Timeless Collection 🤍",
     "features": [],
     "specs": {},
     "badges": [
@@ -1170,7 +1170,7 @@ const PRODUCTS =
     ]
   },
   {
-    "slug": "marie-minks-luxury-fur-keepsake-limited-edition-pre-order-takes-2-weeks",
+    "slug": "kingc-furs-luxury-fur-keepsake-limited-edition-pre-order-takes-2-weeks",
     "title": "Marie Minks Luxury Fur Keepsake – Limited Edition - Pre-Order Takes 2 Weeks",
     "vendor": "Marie Minks",
     "price": 100,
@@ -1183,8 +1183,8 @@ const PRODUCTS =
     "rating": null,
     "reviews": null,
     "images": [
-      "marie-minks-luxury-fur-keepsake-limited-edition-pre-order-takes-2-weeks-1",
-      "marie-minks-luxury-fur-keepsake-limited-edition-pre-order-takes-2-weeks-2"
+      "kingc-furs-luxury-fur-keepsake-limited-edition-pre-order-takes-2-weeks-1",
+      "kingc-furs-luxury-fur-keepsake-limited-edition-pre-order-takes-2-weeks-2"
     ],
     "colors": [],
     "sizes": [
@@ -1201,7 +1201,7 @@ const PRODUCTS =
     ]
   },
   {
-    "slug": "the-regal-mink-coat-signature-marie-minks-collection",
+    "slug": "the-regal-mink-coat-signature-kingc-furs-collection",
     "title": "The Regal Mink Coat – Signature Marie Minks Collection",
     "vendor": "Marie Minks",
     "price": 2350,
@@ -1214,20 +1214,20 @@ const PRODUCTS =
     "rating": null,
     "reviews": null,
     "images": [
-      "the-regal-mink-coat-signature-marie-minks-collection-1",
-      "the-regal-mink-coat-signature-marie-minks-collection-2",
-      "the-regal-mink-coat-signature-marie-minks-collection-3",
-      "the-regal-mink-coat-signature-marie-minks-collection-4",
-      "the-regal-mink-coat-signature-marie-minks-collection-5",
-      "the-regal-mink-coat-signature-marie-minks-collection-6",
-      "the-regal-mink-coat-signature-marie-minks-collection-7",
-      "the-regal-mink-coat-signature-marie-minks-collection-8",
-      "the-regal-mink-coat-signature-marie-minks-collection-9",
-      "the-regal-mink-coat-signature-marie-minks-collection-10",
-      "the-regal-mink-coat-signature-marie-minks-collection-11",
-      "the-regal-mink-coat-signature-marie-minks-collection-12",
-      "the-regal-mink-coat-signature-marie-minks-collection-13",
-      "the-regal-mink-coat-signature-marie-minks-collection-14"
+      "the-regal-mink-coat-signature-kingc-furs-collection-1",
+      "the-regal-mink-coat-signature-kingc-furs-collection-2",
+      "the-regal-mink-coat-signature-kingc-furs-collection-3",
+      "the-regal-mink-coat-signature-kingc-furs-collection-4",
+      "the-regal-mink-coat-signature-kingc-furs-collection-5",
+      "the-regal-mink-coat-signature-kingc-furs-collection-6",
+      "the-regal-mink-coat-signature-kingc-furs-collection-7",
+      "the-regal-mink-coat-signature-kingc-furs-collection-8",
+      "the-regal-mink-coat-signature-kingc-furs-collection-9",
+      "the-regal-mink-coat-signature-kingc-furs-collection-10",
+      "the-regal-mink-coat-signature-kingc-furs-collection-11",
+      "the-regal-mink-coat-signature-kingc-furs-collection-12",
+      "the-regal-mink-coat-signature-kingc-furs-collection-13",
+      "the-regal-mink-coat-signature-kingc-furs-collection-14"
     ],
     "colors": [
       {
@@ -1252,7 +1252,7 @@ const PRODUCTS =
     "badges": []
   },
   {
-    "slug": "luxury-mink-scarf-new-to-marie-minks",
+    "slug": "luxury-mink-scarf-new-to-kingc-furs",
     "title": "Luxury Mink Scarf – New to Marie Minks With Matching Headband",
     "vendor": "Marie Minks",
     "price": 200,
@@ -1265,10 +1265,10 @@ const PRODUCTS =
     "rating": null,
     "reviews": null,
     "images": [
-      "luxury-mink-scarf-new-to-marie-minks-1",
-      "luxury-mink-scarf-new-to-marie-minks-2",
-      "luxury-mink-scarf-new-to-marie-minks-3",
-      "luxury-mink-scarf-new-to-marie-minks-4"
+      "luxury-mink-scarf-new-to-kingc-furs-1",
+      "luxury-mink-scarf-new-to-kingc-furs-2",
+      "luxury-mink-scarf-new-to-kingc-furs-3",
+      "luxury-mink-scarf-new-to-kingc-furs-4"
     ],
     "colors": [
       {
@@ -3878,7 +3878,7 @@ const PRODUCTS =
     ]
   },
   {
-    "slug": "marie-minks-exclusive-style-1",
+    "slug": "kingc-furs-exclusive-style-1",
     "title": "Marie Minks Exclusive Style",
     "vendor": "Marie Minks",
     "price": 1050,
@@ -3891,14 +3891,14 @@ const PRODUCTS =
     "rating": null,
     "reviews": null,
     "images": [
-      "marie-minks-exclusive-style-1-1",
-      "marie-minks-exclusive-style-1-2",
-      "marie-minks-exclusive-style-1-3",
-      "marie-minks-exclusive-style-1-4",
-      "marie-minks-exclusive-style-1-5",
-      "marie-minks-exclusive-style-1-6",
-      "marie-minks-exclusive-style-1-7",
-      "marie-minks-exclusive-style-1-8"
+      "kingc-furs-exclusive-style-1-1",
+      "kingc-furs-exclusive-style-1-2",
+      "kingc-furs-exclusive-style-1-3",
+      "kingc-furs-exclusive-style-1-4",
+      "kingc-furs-exclusive-style-1-5",
+      "kingc-furs-exclusive-style-1-6",
+      "kingc-furs-exclusive-style-1-7",
+      "kingc-furs-exclusive-style-1-8"
     ],
     "colors": [
       {
@@ -3994,7 +3994,7 @@ const PRODUCTS =
     ]
   },
   {
-    "slug": "marie-minks-exclusive-kids-peplum-jackets",
+    "slug": "kingc-furs-exclusive-kids-peplum-jackets",
     "title": "Marie Minks Exclusive Kids Peplum Jackets",
     "vendor": "Marie Minks",
     "price": 250,
@@ -4007,21 +4007,21 @@ const PRODUCTS =
     "rating": null,
     "reviews": null,
     "images": [
-      "marie-minks-exclusive-kids-peplum-jackets-1",
-      "marie-minks-exclusive-kids-peplum-jackets-2",
-      "marie-minks-exclusive-kids-peplum-jackets-3",
-      "marie-minks-exclusive-kids-peplum-jackets-4",
-      "marie-minks-exclusive-kids-peplum-jackets-5",
-      "marie-minks-exclusive-kids-peplum-jackets-6",
-      "marie-minks-exclusive-kids-peplum-jackets-7",
-      "marie-minks-exclusive-kids-peplum-jackets-8",
-      "marie-minks-exclusive-kids-peplum-jackets-9",
-      "marie-minks-exclusive-kids-peplum-jackets-10",
-      "marie-minks-exclusive-kids-peplum-jackets-11",
-      "marie-minks-exclusive-kids-peplum-jackets-12",
-      "marie-minks-exclusive-kids-peplum-jackets-13",
-      "marie-minks-exclusive-kids-peplum-jackets-14",
-      "marie-minks-exclusive-kids-peplum-jackets-15"
+      "kingc-furs-exclusive-kids-peplum-jackets-1",
+      "kingc-furs-exclusive-kids-peplum-jackets-2",
+      "kingc-furs-exclusive-kids-peplum-jackets-3",
+      "kingc-furs-exclusive-kids-peplum-jackets-4",
+      "kingc-furs-exclusive-kids-peplum-jackets-5",
+      "kingc-furs-exclusive-kids-peplum-jackets-6",
+      "kingc-furs-exclusive-kids-peplum-jackets-7",
+      "kingc-furs-exclusive-kids-peplum-jackets-8",
+      "kingc-furs-exclusive-kids-peplum-jackets-9",
+      "kingc-furs-exclusive-kids-peplum-jackets-10",
+      "kingc-furs-exclusive-kids-peplum-jackets-11",
+      "kingc-furs-exclusive-kids-peplum-jackets-12",
+      "kingc-furs-exclusive-kids-peplum-jackets-13",
+      "kingc-furs-exclusive-kids-peplum-jackets-14",
+      "kingc-furs-exclusive-kids-peplum-jackets-15"
     ],
     "colors": [
       {
@@ -4499,7 +4499,7 @@ const PRODUCTS =
     "badges": []
   },
   {
-    "slug": "limited-edition-marie-minks-fox-fur-coat-in-grey",
+    "slug": "limited-edition-kingc-furs-fox-fur-coat-in-grey",
     "title": "Limited Edition Marie Minks Fox Fur Coat In Grey",
     "vendor": "Marie Minks",
     "price": 300,
@@ -4512,8 +4512,8 @@ const PRODUCTS =
     "rating": null,
     "reviews": null,
     "images": [
-      "limited-edition-marie-minks-fox-fur-coat-in-grey-1",
-      "limited-edition-marie-minks-fox-fur-coat-in-grey-2"
+      "limited-edition-kingc-furs-fox-fur-coat-in-grey-1",
+      "limited-edition-kingc-furs-fox-fur-coat-in-grey-2"
     ],
     "colors": [],
     "sizes": [

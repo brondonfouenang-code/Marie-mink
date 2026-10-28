@@ -2037,7 +2037,7 @@ function serveStatic(req, res, pathname) {
       securityHeaders(res, req, {
         "Content-Type": MIME[ext] || "application/octet-stream",
         "Content-Length": stat.size,
-        ETag: etag,
+          ETag: etag,
         "Cache-Control": ext === ".html" ? "no-cache" : isAdmin ? "no-store" : "public, max-age=3600"
       })
     );

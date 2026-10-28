@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MARIE MINKS — Scripts du site
+   Marie Minks — Scripts du site
    Vanilla JS, aucune dépendance. Un seul fichier + data.js.
    ========================================================================== */
 

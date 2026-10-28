@@ -1,22 +1,22 @@
 # Service systemd pour le site Marie Minks.
 #
-# A installer dans /etc/systemd/system/marieminks.service
-#   sudo cp deploy/marieminks.service /etc/systemd/system/
+# A installer dans /etc/systemd/system/kingcfurs.service
+#   sudo cp deploy/kingcfurs.service /etc/systemd/system/
 #   sudo systemctl daemon-reload
-#   sudo systemctl enable --now marieminks
+#   sudo systemctl enable --now kingcfurs
 #
 # Commandes utiles :
-#   sudo systemctl status marieminks      voir l'etat
-#   sudo systemctl restart marieminks     redemarrer apres un changement
-#   sudo journalctl -u marieminks -f      voir les journaux en direct
-#   sudo journalctl -u marieminks --since today
+#   sudo systemctl status kingcfurs      voir l'etat
+#   sudo systemctl restart kingcfurs     redemarrer apres un changement
+#   sudo journalctl -u kingcfurs -f      voir les journaux en direct
+#   sudo journalctl -u kingcfurs --since today
 #
 # Pour voir le mot de passe du premier compte, au demarrage uniquement :
-#   sudo journalctl -u marieminks -n 30 --no-pager
+#   sudo journalctl -u kingcfurs -n 30 --no-pager
 
 [Unit]
 Description=Site Marie Minks
-Documentation=https://marieminks.co.uk
+Documentation=https://kingcfurs.co.uk
 # Le service demarre apres le reseau : sans cela, Node peut ne pas
 #voir les interfaces au moment du demarrage sur un VPS lent.
 After=network-online.target
@@ -28,18 +28,18 @@ Type=simple
 # --- Utilisateur dedie -----------------------------------------------------
 # Le service ne tourne PAS en root. C'est la premiere des precautions :
 # une faille dans le site ne donne pas les privileges administrateur.
-User=marieminks
-Group=marieminks
+User=kingcfurs
+Group=kingcfurs
 
-WorkingDirectory=/srv/marieminks
+WorkingDirectory=/srv/kingcfurs
 
 # --- Configuration ---------------------------------------------------------
-EnvironmentFile=/etc/marieminks/marieminks.env
+EnvironmentFile=/etc/kingcfurs/kingcfurs.env
 
 # --- Demarrage -------------------------------------------------------------
 # --reset-password ne doit PAS etre ici : ce drapeau affiche un mot de
 # passe et termine le processus, ce qui ferait tomber le service.
-ExecStart=/usr/bin/node /srv/marieminks/server.js
+ExecStart=/usr/bin/node /srv/kingcfurs/server.js
 
 # --- Redemarrage automatique ------------------------------------------------
 Restart=always
@@ -52,7 +52,7 @@ StartLimitIntervalSec=60
 # --- Journalisation --------------------------------------------------------
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=marieminks
+SyslogIdentifier=kingcfurs
 
 # --- Durcissement ----------------------------------------------------------
 # Le processus n'a besoin que de lire ses fichiers et d'ecrire dans data/.
@@ -72,7 +72,7 @@ RestrictNamespaces=true
 RestrictRealtime=true
 RestrictSUIDSGID=true
 # Seule exception : data/ doit rester inscriptible.
-ReadWritePaths=/srv/marieminks/data
+ReadWritePaths=/srv/kingcfurs/data
 LockPersonality=true
 MemoryDenyWriteExecute=true
 
